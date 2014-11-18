@@ -1,0 +1,20 @@
+{
+  "topics": [
+    {
+      "langs": "nl,en",
+      "selectedLayers": [
+        "be.vmm.rioolappurtenance",
+        "be.vmm.rioollink",
+        "be.vmm.koppelpunt",
+        "be.waterinfo.waterlopen"
+      ],
+      "backgroundLayers": [
+        "be.agiv.color",
+        "be.agiv.grey",
+        "be.agiv.sat"
+      ],
+      "id": "ech",
+      "showCatalog": true
+    }
+  ]
+}

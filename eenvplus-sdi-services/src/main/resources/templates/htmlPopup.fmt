@@ -1,0 +1,15 @@
+<div class="htmlpopup-container">
+	<div class="htmlpopup-header">
+		${feature.type}
+	</div>
+	<div class="htmlpopup-content">
+		<span>Information</span>
+		<br />
+		<table>
+			<#assign properties = feature.properties>
+			<#list properties.entrySet() as entry>
+			<tr><td class="cell-left">${entry.key}</td><td>${entry.value!}</td></tr>
+			</#list>
+		</table>
+	</div>
+</div>

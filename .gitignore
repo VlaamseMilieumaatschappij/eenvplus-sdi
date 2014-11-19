@@ -2,6 +2,7 @@ target/
 .settings/
 .project
 .classpath
+*.iml
 *.tlog
 *.log
 *.log*

@@ -1,4 +1,4 @@
-package be.vmm.eenvplus.sdi.model;
+package be.vmm.eenvplus.sdi.api.json;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package be.vmm.eenvplus.sdi.model;
+package be.vmm.eenvplus.sdi.api.json;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -30,8 +30,22 @@ public class JsonFeature<T> {
 		this.object = (T) Class.forName(type).newInstance();
 	}
 
+	public Object getId() throws IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+		return getBeanInfo().getIdDescriptor().getReadMethod().invoke(object);
+	}
+
+	public Object getFeatureId() throws IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+		return getId();
+	}
+
 	public String getType() {
 		return object.getClass().getName();
+	}
+
+	public String getLayerBodId() {
+		return "all:" + getType();
 	}
 
 	public Map<String, Object> getProperties() throws IntrospectionException,

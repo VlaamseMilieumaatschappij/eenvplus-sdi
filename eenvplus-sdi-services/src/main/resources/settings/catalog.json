@@ -9,28 +9,28 @@
           "category": "layer",
           "staging": "prod",
           "label": "Sewer appurtenance",
-          "layerBodId": "be.vmm.rioolappurtenance",
+          "layerBodId": "be.vmm.eenvplus.sdi.model.RioolAppurtenance",
           "id": 1386
         },
         {
           "category": "layer",
           "staging": "prod",
           "label": "Sewer link",
-          "layerBodId": "be.vmm.rioollink",
+          "layerBodId": "be.vmm.eenvplus.sdi.model.RioolLink",
           "id": 1386
         },
         {
           "category": "layer",
           "staging": "prod",
           "label": "Mountpoint",
-          "layerBodId": "be.vmm.koppelpunt",
+          "layerBodId": "be.vmm.eenvplus.sdi.model.KoppelPunt",
           "id": 1386
         },
         {
           "category": "layer",
           "staging": "prod",
           "label": "Hydrographic network",
-          "layerBodId": "be.waterinfo.waterlopen",
+          "layerBodId": "be.vmm.waterlopen",
           "id": 1386
         }
       ],

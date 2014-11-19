@@ -1,4 +1,4 @@
-package be.vmm.eenvplus.sdi.model;
+package be.vmm.eenvplus.sdi.api.json;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -19,13 +19,16 @@ public class JsonBeanInfo {
 
 		if (info == null) {
 			try {
+				PropertyDescriptor idDescriptor = null;
 				Map<String, PropertyDescriptor> attributeDescriptors = new LinkedHashMap<String, PropertyDescriptor>();
 				PropertyDescriptor geometryDescriptor = null;
 
 				BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
 				for (PropertyDescriptor descriptor : beanInfo
 						.getPropertyDescriptors()) {
-					if (Geometry.class.isAssignableFrom(descriptor
+					if ("id".equals(descriptor.getName())) {
+						idDescriptor = descriptor;
+					} else if (Geometry.class.isAssignableFrom(descriptor
 							.getPropertyType())) {
 						geometryDescriptor = descriptor;
 					} else if (!"class".equals(descriptor.getName())) {
@@ -34,7 +37,7 @@ public class JsonBeanInfo {
 					}
 				}
 
-				info = new JsonBeanInfo(attributeDescriptors,
+				info = new JsonBeanInfo(idDescriptor, attributeDescriptors,
 						geometryDescriptor);
 				cache.put(clazz, info);
 			} catch (Exception e) {
@@ -45,13 +48,20 @@ public class JsonBeanInfo {
 		return info;
 	}
 
+	protected PropertyDescriptor idDescriptor;
 	protected Map<String, PropertyDescriptor> attributeDescriptors;
 	protected PropertyDescriptor geometryDescriptor;
 
-	public JsonBeanInfo(Map<String, PropertyDescriptor> attributeDescriptors,
+	public JsonBeanInfo(PropertyDescriptor idDescriptor,
+			Map<String, PropertyDescriptor> attributeDescriptors,
 			PropertyDescriptor geometryDescriptor) {
+		this.idDescriptor = idDescriptor;
 		this.attributeDescriptors = attributeDescriptors;
 		this.geometryDescriptor = geometryDescriptor;
+	}
+
+	public PropertyDescriptor getIdDescriptor() {
+		return idDescriptor;
 	}
 
 	public Map<String, PropertyDescriptor> getAttributeDescriptors() {

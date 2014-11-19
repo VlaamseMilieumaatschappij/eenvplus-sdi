@@ -10,6 +10,7 @@ import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import be.vmm.eenvplus.sdi.api.SearchResult;
+import be.vmm.eenvplus.sdi.api.SearchResults;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,7 +52,7 @@ public class CrabGeoLocator {
 		return value;
 	}
 
-	public List<SearchResult> search(String term, CoordinateReferenceSystem crs)
+	public SearchResults search(String term, CoordinateReferenceSystem crs)
 			throws Exception {
 
 		if (!CRS.equalsIgnoreMetadata(crs, LAMBERT_72)) {
@@ -108,9 +109,9 @@ public class CrabGeoLocator {
 				results.add(result);
 			}
 
-			return results;
+			return new SearchResults(results);
 		} else {
-			return Collections.emptyList();
+			return new SearchResults();
 		}
 	}
 }

@@ -24,14 +24,14 @@ import javax.ws.rs.core.Response;
 
 import org.geotools.referencing.CRS;
 
-import be.vmm.eenvplus.sdi.api.SearchResult;
+import be.vmm.eenvplus.sdi.api.SearchResults;
 import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
 import be.vmm.eenvplus.sdi.model.JsonBeanInfo;
 import be.vmm.eenvplus.sdi.model.JsonFeature;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
 
 @Stateless
-@Path("/")
+@Path("/services")
 public class ServicesEndPoint {
 
 	@PersistenceContext(unitName = "eenvplus")
@@ -196,16 +196,16 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/SearchServer")
 	@Produces("application/json")
-	public List<SearchResult> search(@PathParam("mapId") String mapId,
+	public SearchResults search(@PathParam("mapId") String mapId,
 			@QueryParam("searchText") String searchText,
 			@QueryParam("type") String type, @QueryParam("lang") String lang)
 			throws Exception {
 
-		if ("location".equals(type)) {
+		if ("locations".equals(type)) {
 			return geoLocator
 					.search(searchText, CRS.decode("EPSG:31370", true));
 		} else {
-			return Collections.emptyList();
+			return new SearchResults();
 		}
 	}
 

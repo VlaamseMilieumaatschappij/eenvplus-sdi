@@ -5,4 +5,4 @@ eENVplus SDI
 
 Build
 
-mvn build install
+mvn clean install

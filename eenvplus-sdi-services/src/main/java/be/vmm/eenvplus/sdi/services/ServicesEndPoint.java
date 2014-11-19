@@ -13,6 +13,11 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -24,11 +29,18 @@ import javax.ws.rs.core.Response;
 
 import org.geotools.referencing.CRS;
 
+import be.vmm.eenvplus.sdi.api.IdentifyResults;
 import be.vmm.eenvplus.sdi.api.SearchResults;
+import be.vmm.eenvplus.sdi.api.json.GeometryParam;
+import be.vmm.eenvplus.sdi.api.json.JsonBeanInfo;
+import be.vmm.eenvplus.sdi.api.json.JsonFeature;
+import be.vmm.eenvplus.sdi.api.json.JsonFeatureList;
+import be.vmm.eenvplus.sdi.api.json.MapExtentParam;
+import be.vmm.eenvplus.sdi.api.json.ViewPortParam;
 import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
-import be.vmm.eenvplus.sdi.model.JsonBeanInfo;
-import be.vmm.eenvplus.sdi.model.JsonFeature;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 @Stateless
 @Path("/services")
@@ -159,8 +171,39 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/MapServer/identify")
 	@Produces("application/json")
-	public List<Object> identify(@PathParam("mapId") String mapId) {
-		return Collections.emptyList();
+	public IdentifyResults<Object> identify(@PathParam("mapId") String mapId,
+			@BeanParam GeometryParam geometry,
+			@QueryParam("layers") String layers,
+			@QueryParam("mapExtent") MapExtentParam mapExtent,
+			@QueryParam("imageDisplay") ViewPortParam imageDisplay,
+			@QueryParam("tolerance") Integer tolerance,
+			@QueryParam("lang") String lang) throws ClassNotFoundException {
+
+		Geometry buffer = geometry.getGeometry().buffer(10.0);
+		buffer.setSRID(31370);
+
+		List<Object> results = new ArrayList<Object>();
+
+		for (String layerBodId : layers.split(",")) {
+
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+			Class<Object> clazz = getFeatureClass(layerBodId);
+
+			CriteriaQuery<Object> criteria = builder.createQuery(clazz);
+			Root<Object> root = criteria.from(clazz);
+			criteria.select(root);
+
+			criteria.where(builder.equal(
+					builder.function("intersects", Boolean.class,
+							root.get("geom"), builder.literal(buffer)),
+					Boolean.TRUE));
+
+			TypedQuery<Object> query = entityManager.createQuery(criteria);
+			results.addAll(query.getResultList());
+		}
+
+		return new IdentifyResults<Object>(new JsonFeatureList<Object>(results));
 	}
 
 	@GET
@@ -209,8 +252,13 @@ public class ServicesEndPoint {
 		}
 	}
 
-	protected Class<?> getFeatureClass(String layerBodId)
+	protected Class<Object> getFeatureClass(String layerBodId)
 			throws ClassNotFoundException {
-		return Class.forName(layerBodId);
+
+		int index = layerBodId.indexOf(':');
+		if (index > 0)
+			layerBodId = layerBodId.substring(index + 1);
+
+		return (Class<Object>) Class.forName(layerBodId);
 	}
 }

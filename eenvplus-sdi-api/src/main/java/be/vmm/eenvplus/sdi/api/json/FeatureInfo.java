@@ -9,13 +9,13 @@ import java.util.WeakHashMap;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class JsonBeanInfo {
+public class FeatureInfo {
 
-	protected static Map<Class<?>, JsonBeanInfo> cache = new WeakHashMap<Class<?>, JsonBeanInfo>();
+	protected static Map<Class<?>, FeatureInfo> cache = new WeakHashMap<Class<?>, FeatureInfo>();
 
-	public static JsonBeanInfo getBeanInfo(Class<?> clazz) {
+	public static FeatureInfo getFeatureInfo(Class<?> clazz) {
 
-		JsonBeanInfo info = (JsonBeanInfo) cache.get(clazz);
+		FeatureInfo info = (FeatureInfo) cache.get(clazz);
 
 		if (info == null) {
 			try {
@@ -29,7 +29,7 @@ public class JsonBeanInfo {
 					if ("id".equals(descriptor.getName())) {
 						idDescriptor = descriptor;
 					} else if (Geometry.class.isAssignableFrom(descriptor
-							.getPropertyType())) {
+							.getPropertyType()) && geometryDescriptor == null) {
 						geometryDescriptor = descriptor;
 					} else if (!"class".equals(descriptor.getName())) {
 						attributeDescriptors.put(descriptor.getName(),
@@ -37,7 +37,7 @@ public class JsonBeanInfo {
 					}
 				}
 
-				info = new JsonBeanInfo(idDescriptor, attributeDescriptors,
+				info = new FeatureInfo(idDescriptor, attributeDescriptors,
 						geometryDescriptor);
 				cache.put(clazz, info);
 			} catch (Exception e) {
@@ -48,11 +48,27 @@ public class JsonBeanInfo {
 		return info;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static Class<Object> getFeatureClass(String layerBodId)
+			throws ClassNotFoundException {
+
+		int index = layerBodId.indexOf(':');
+		if (index > 0)
+			layerBodId = layerBodId.substring(index + 1);
+
+		return (Class<Object>) Class.forName(layerBodId);
+	}
+
+	public static String getLayerBodId(Class<?> clazz) {
+
+		return "all:" + clazz.getName();
+	}
+
 	protected PropertyDescriptor idDescriptor;
 	protected Map<String, PropertyDescriptor> attributeDescriptors;
 	protected PropertyDescriptor geometryDescriptor;
 
-	public JsonBeanInfo(PropertyDescriptor idDescriptor,
+	public FeatureInfo(PropertyDescriptor idDescriptor,
 			Map<String, PropertyDescriptor> attributeDescriptors,
 			PropertyDescriptor geometryDescriptor) {
 		this.idDescriptor = idDescriptor;

@@ -1,8 +1,12 @@
 package be.vmm.eenvplus.sdi.api.json;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class MapExtentParam {
+
+	protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
 	protected Envelope envelope;
 
@@ -20,8 +24,16 @@ public class MapExtentParam {
 		this.envelope = envelope;
 	}
 
+	public MapExtentParam(Geometry geometry) {
+		this.envelope = geometry.getEnvelopeInternal();
+	}
+
 	public Envelope getEnvelope() {
 		return envelope;
+	}
+
+	public Geometry getGeometry() {
+		return GEOMETRY_FACTORY.toGeometry(envelope);
 	}
 
 	@Override

@@ -14,20 +14,21 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class JsonFeature<T> {
+public class Feature<T> {
 
 	protected T object;
 
-	public JsonFeature(T object) {
+	public Feature(T object) {
 		this.object = object;
 	}
 
 	@JsonCreator
 	@SuppressWarnings("unchecked")
-	public JsonFeature(@JsonProperty("type") String type)
+	public Feature(@JsonProperty("layerBodId") String layerBodId)
 			throws InstantiationException, IllegalAccessException,
 			ClassNotFoundException {
-		this.object = (T) Class.forName(type).newInstance();
+		this.object = (T) FeatureInfo.getFeatureClass(layerBodId)
+				.newInstance();
 	}
 
 	public Object getId() throws IllegalAccessException,
@@ -41,17 +42,17 @@ public class JsonFeature<T> {
 	}
 
 	public String getType() {
-		return object.getClass().getName();
+		return "Feature";
 	}
 
 	public String getLayerBodId() {
-		return "all:" + getType();
+		return FeatureInfo.getLayerBodId(object.getClass());
 	}
 
 	public Map<String, Object> getProperties() throws IntrospectionException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
-		return new JsonFeatureProperties<T>(object);
+		return new FeatureProperties<T>(object);
 	}
 
 	public void setProperties(Map<String, Object> properties)
@@ -72,7 +73,7 @@ public class JsonFeature<T> {
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
 
-		return (Geometry) JsonBeanInfo.getBeanInfo(object.getClass())
+		return (Geometry) FeatureInfo.getFeatureInfo(object.getClass())
 				.getGeometryDescriptor().getReadMethod().invoke(object);
 	}
 
@@ -80,8 +81,8 @@ public class JsonFeature<T> {
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
 
-		JsonBeanInfo.getBeanInfo(object.getClass()).getGeometryDescriptor()
-				.getWriteMethod().invoke(object, value);
+		FeatureInfo.getFeatureInfo(object.getClass())
+				.getGeometryDescriptor().getWriteMethod().invoke(object, value);
 	}
 
 	@Override
@@ -93,17 +94,17 @@ public class JsonFeature<T> {
 	@SuppressWarnings("unchecked")
 	public boolean equals(Object o) {
 
-		if (!(o instanceof JsonFeature<?>))
+		if (!(o instanceof Feature<?>))
 			return false;
 
-		return object.equals(((JsonFeature<T>) o).object);
+		return object.equals(((Feature<T>) o).object);
 	}
 
 	public T unwrap() {
 		return object;
 	}
 
-	protected JsonBeanInfo getBeanInfo() {
-		return JsonBeanInfo.getBeanInfo(object.getClass());
+	protected FeatureInfo getBeanInfo() {
+		return FeatureInfo.getFeatureInfo(object.getClass());
 	}
 }

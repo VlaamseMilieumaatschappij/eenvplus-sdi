@@ -1,6 +1,6 @@
 <div class="htmlpopup-container">
 	<div class="htmlpopup-header">
-		${feature.type}
+		${feature.layerBodId}
 	</div>
 	<div class="htmlpopup-content">
 		<span>Information</span>

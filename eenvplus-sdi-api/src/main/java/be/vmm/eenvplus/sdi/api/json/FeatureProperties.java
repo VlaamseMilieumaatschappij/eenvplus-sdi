@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class JsonFeatureProperties<T> implements Map<String, Object> {
+public class FeatureProperties<T> implements Map<String, Object> {
 
 	public class JsonFeaturePropertiesEntrySet implements
 			Set<Map.Entry<String, Object>> {
@@ -31,22 +31,29 @@ public class JsonFeatureProperties<T> implements Map<String, Object> {
 			throw new UnsupportedOperationException();
 		}
 
+		@SuppressWarnings("unchecked")
 		public boolean equals(Object o) {
-			throw new UnsupportedOperationException();
+
+			if (!(o instanceof FeatureProperties))
+				return false;
+
+			FeatureProperties<T> p = (FeatureProperties<T>) o;
+
+			return object.equals(p.object);
 		}
 
 		public int hashCode() {
-			throw new UnsupportedOperationException();
+			return object.hashCode();
 		}
 
 		public boolean isEmpty() {
-			return JsonFeatureProperties.this.isEmpty();
+			return FeatureProperties.this.isEmpty();
 		}
 
 		public Iterator<Map.Entry<String, Object>> iterator() {
 			return new Iterator<Map.Entry<String, Object>>() {
 
-				Iterator<PropertyDescriptor> delegate = JsonFeatureProperties.this
+				Iterator<PropertyDescriptor> delegate = FeatureProperties.this
 						.getBeanInfo().getAttributeDescriptors().values()
 						.iterator();
 
@@ -112,17 +119,17 @@ public class JsonFeatureProperties<T> implements Map<String, Object> {
 		}
 
 		public int size() {
-			return JsonFeatureProperties.this.size();
+			return FeatureProperties.this.size();
 		}
 
 		public Object[] toArray() {
-			return toArray(new Object[JsonFeatureProperties.this.size()]);
+			return toArray(new Object[FeatureProperties.this.size()]);
 		}
 
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <S> S[] toArray(S[] array) {
 
-			int size = JsonFeatureProperties.this.size();
+			int size = FeatureProperties.this.size();
 
 			if (array.length < size)
 				array = (S[]) new Object[size];
@@ -154,7 +161,7 @@ public class JsonFeatureProperties<T> implements Map<String, Object> {
 
 	protected T object;
 
-	public JsonFeatureProperties(T object) {
+	public FeatureProperties(T object) {
 		this.object = object;
 	}
 
@@ -254,7 +261,7 @@ public class JsonFeatureProperties<T> implements Map<String, Object> {
 		return new JsonFeaturePropertiesEntrySet();
 	}
 
-	protected JsonBeanInfo getBeanInfo() {
-		return JsonBeanInfo.getBeanInfo(object.getClass());
+	protected FeatureInfo getBeanInfo() {
+		return FeatureInfo.getFeatureInfo(object.getClass());
 	}
 }

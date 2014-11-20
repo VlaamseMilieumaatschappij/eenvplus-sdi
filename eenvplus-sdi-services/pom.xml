@@ -28,10 +28,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>be.vmm.eenvplus</groupId>
-			<artifactId>eenvplus-sdi-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>be.vmm.eenvplus</groupId>
 			<artifactId>eenvplus-sdi-model</artifactId>
 		</dependency>
 		<dependency>

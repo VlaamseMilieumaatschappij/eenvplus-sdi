@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class JsonFeatureList<T> implements List<JsonFeature<T>> {
+public class FeatureList<T> implements List<Feature<T>> {
 
 	public static class JsonFeatureIterator<T> implements
-			Iterator<JsonFeature<T>> {
+			Iterator<Feature<T>> {
 
 		protected Iterator<T> iterator;
 
@@ -23,8 +23,8 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		}
 
 		@Override
-		public JsonFeature<T> next() {
-			return new JsonFeature<T>(iterator.next());
+		public Feature<T> next() {
+			return new Feature<T>(iterator.next());
 		}
 
 		@Override
@@ -34,7 +34,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 	}
 
 	public static class JsonFeatureListIterator<T> extends
-			JsonFeatureIterator<T> implements ListIterator<JsonFeature<T>> {
+			JsonFeatureIterator<T> implements ListIterator<Feature<T>> {
 
 		public JsonFeatureListIterator(ListIterator<T> iterator) {
 			super(iterator);
@@ -46,8 +46,8 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		}
 
 		@Override
-		public JsonFeature<T> previous() {
-			return new JsonFeature<T>(((ListIterator<T>) iterator).previous());
+		public Feature<T> previous() {
+			return new Feature<T>(((ListIterator<T>) iterator).previous());
 		}
 
 		@Override
@@ -61,31 +61,31 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		}
 
 		@Override
-		public void set(JsonFeature<T> e) {
+		public void set(Feature<T> e) {
 			((ListIterator<T>) iterator).set(e.unwrap());
 		}
 
 		@Override
-		public void add(JsonFeature<T> e) {
+		public void add(Feature<T> e) {
 			((ListIterator<T>) iterator).add(e.unwrap());
 		}
 	}
 
 	protected List<T> delegate;
 
-	public JsonFeatureList() {
+	public FeatureList() {
 		this.delegate = new ArrayList<T>();
 	}
 
-	public JsonFeatureList(List<T> delegate) {
+	public FeatureList(List<T> delegate) {
 		this.delegate = delegate;
 	}
 
-	public boolean add(JsonFeature<T> e) {
+	public boolean add(Feature<T> e) {
 		return delegate.add(e.unwrap());
 	}
 
-	public boolean addAll(Collection<? extends JsonFeature<T>> c) {
+	public boolean addAll(Collection<? extends Feature<T>> c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -96,7 +96,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 	public boolean contains(Object o) {
 
 		for (T e : delegate) {
-			if (o.equals(new JsonFeature<T>(e)))
+			if (o.equals(new Feature<T>(e)))
 				return true;
 		}
 		return false;
@@ -116,10 +116,10 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		if (!(o instanceof Collection<?>))
 			return false;
 
-		Iterator<JsonFeature<T>> i1 = iterator();
+		Iterator<Feature<T>> i1 = iterator();
 		Iterator<?> i2 = ((Collection<?>) o).iterator();
 		while (i1.hasNext() && i2.hasNext()) {
-			JsonFeature<T> o1 = i1.next();
+			Feature<T> o1 = i1.next();
 			Object o2 = i2.next();
 			if (!(o1 == null ? o2 == null : o1.equals(o2)))
 				return false;
@@ -135,7 +135,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		return delegate.isEmpty();
 	}
 
-	public Iterator<JsonFeature<T>> iterator() {
+	public Iterator<Feature<T>> iterator() {
 		return new JsonFeatureIterator<T>(delegate.iterator());
 	}
 
@@ -144,7 +144,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		boolean result = false;
 		Iterator<T> i = delegate.iterator();
 		while (i.hasNext()) {
-			if (e.equals(new JsonFeature<T>(i.next()))) {
+			if (e.equals(new Feature<T>(i.next()))) {
 				i.remove();
 				result = true;
 			}
@@ -157,7 +157,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		boolean result = false;
 		Iterator<T> i = delegate.iterator();
 		while (i.hasNext()) {
-			if (c.contains(new JsonFeature<T>(i.next()))) {
+			if (c.contains(new Feature<T>(i.next()))) {
 				i.remove();
 				result = true;
 			}
@@ -169,7 +169,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		boolean result = false;
 		Iterator<T> i = delegate.iterator();
 		while (i.hasNext()) {
-			if (!c.contains(new JsonFeature<T>(i.next()))) {
+			if (!c.contains(new Feature<T>(i.next()))) {
 				i.remove();
 				result = true;
 			}
@@ -202,14 +202,14 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 	}
 
 	public String toString() {
-		Iterator<JsonFeature<T>> i = iterator();
+		Iterator<Feature<T>> i = iterator();
 		if (!i.hasNext())
 			return "[]";
 
 		StringBuilder sb = new StringBuilder();
 		sb.append('[');
 		for (;;) {
-			JsonFeature<T> e = i.next();
+			Feature<T> e = i.next();
 			sb.append(e);
 			if (!i.hasNext())
 				return sb.append(']').toString();
@@ -218,28 +218,28 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 	}
 
 	@Override
-	public boolean addAll(int index, Collection<? extends JsonFeature<T>> c) {
+	public boolean addAll(int index, Collection<? extends Feature<T>> c) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public JsonFeature<T> get(int index) {
-		return new JsonFeature<T>(delegate.get(index));
+	public Feature<T> get(int index) {
+		return new Feature<T>(delegate.get(index));
 	}
 
 	@Override
-	public JsonFeature<T> set(int index, JsonFeature<T> e) {
-		return new JsonFeature<T>(delegate.set(index, e.unwrap()));
+	public Feature<T> set(int index, Feature<T> e) {
+		return new Feature<T>(delegate.set(index, e.unwrap()));
 	}
 
 	@Override
-	public void add(int index, JsonFeature<T> e) {
+	public void add(int index, Feature<T> e) {
 		delegate.add(index, e.unwrap());
 	}
 
 	@Override
-	public JsonFeature<T> remove(int index) {
-		return new JsonFeature<T>(delegate.remove(index));
+	public Feature<T> remove(int index) {
+		return new Feature<T>(delegate.remove(index));
 	}
 
 	@Override
@@ -248,7 +248,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		int size = delegate.size();
 
 		for (int i = 0; i < size; i++) {
-			if (new JsonFeature<T>(delegate.get(i)).equals(e))
+			if (new Feature<T>(delegate.get(i)).equals(e))
 				return i;
 		}
 
@@ -261,7 +261,7 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 		int size = delegate.size();
 
 		for (int i = size - 1; i >= 0; i--) {
-			if (new JsonFeature<T>(delegate.get(i)).equals(e))
+			if (new Feature<T>(delegate.get(i)).equals(e))
 				return i;
 		}
 
@@ -269,17 +269,17 @@ public class JsonFeatureList<T> implements List<JsonFeature<T>> {
 	}
 
 	@Override
-	public ListIterator<JsonFeature<T>> listIterator() {
+	public ListIterator<Feature<T>> listIterator() {
 		return new JsonFeatureListIterator<T>(delegate.listIterator());
 	}
 
 	@Override
-	public ListIterator<JsonFeature<T>> listIterator(int index) {
+	public ListIterator<Feature<T>> listIterator(int index) {
 		return new JsonFeatureListIterator<T>(delegate.listIterator(index));
 	}
 
 	@Override
-	public List<JsonFeature<T>> subList(int fromIndex, int toIndex) {
-		return new JsonFeatureList<T>(delegate.subList(fromIndex, toIndex));
+	public List<Feature<T>> subList(int fromIndex, int toIndex) {
+		return new FeatureList<T>(delegate.subList(fromIndex, toIndex));
 	}
 }

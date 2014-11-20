@@ -3,25 +3,25 @@ package be.vmm.eenvplus.sdi.api;
 import java.util.Collections;
 import java.util.List;
 
-import be.vmm.eenvplus.sdi.api.json.JsonFeature;
+import be.vmm.eenvplus.sdi.api.json.Feature;
 
 public class IdentifyResults<T> {
 
-	protected List<JsonFeature<T>> results;
+	protected List<Feature<T>> results;
 
 	public IdentifyResults() {
 		this.results = Collections.emptyList();
 	}
 
-	public IdentifyResults(List<JsonFeature<T>> results) {
+	public IdentifyResults(List<Feature<T>> results) {
 		this.results = results;
 	}
 
-	public List<JsonFeature<T>> getResults() {
+	public List<Feature<T>> getResults() {
 		return results;
 	}
 
-	public void setResults(List<JsonFeature<T>> results) {
+	public void setResults(List<Feature<T>> results) {
 		this.results = results;
 	}
 }

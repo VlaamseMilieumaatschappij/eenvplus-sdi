@@ -101,6 +101,8 @@ public class CrabGeoLocator {
 
 				JsonNode location = locationItem.get("Location");
 				if (location != null) {
+					// x and y where switched in GeoAdmin. Fixed in
+					// /src/components/search/SearchDirective.js#getLocationTemplate
 					result.setAttr("x", location.get("X_Lambert72").asDouble());
 					result.setAttr("y", location.get("Y_Lambert72").asDouble());
 				}

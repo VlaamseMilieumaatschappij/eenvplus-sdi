@@ -391,11 +391,10 @@ public class ServicesEndPoint {
 	 * following geocoded locations:
 	 * <ul>
 	 * <li>Cantons, Cities and communes</li>
-	 * <li>All names of communes</li>
-	 * <li>The names of provinces</li>
-	 * <li>The ZIP codes</li>
-	 * <li>The addresses</li>
-	 * <li>The cadastral parcels</li>
+	 * <li>Names of communes</li>
+	 * <li>ZIP codes</li>
+	 * <li>Addresses</li>
+	 * <li>Cadastral parcels</li>
 	 * </ul>
 	 * </li>
 	 * <li>The <strong>layer search</strong> which enables the search of layers.

@@ -1,10 +1,15 @@
 package be.vmm.eenvplus.sdi.model;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -35,6 +40,10 @@ public class RioolAppurtenance {
 	protected int koppelpuntId;
 	protected String label;
 	protected String omschrijving;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "rioolappurtenanceid")
+	protected List<RioolAppurtenanceStatus> statussen;
 
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@JsonSerialize(using = GeometrySerializer.class)
@@ -98,6 +107,14 @@ public class RioolAppurtenance {
 
 	public void setOmschrijving(String omschrijving) {
 		this.omschrijving = omschrijving;
+	}
+
+	public List<RioolAppurtenanceStatus> getStatussen() {
+		return statussen;
+	}
+
+	public void setStatussen(List<RioolAppurtenanceStatus> statussen) {
+		this.statussen = statussen;
 	}
 
 	public Geometry getGeom() {

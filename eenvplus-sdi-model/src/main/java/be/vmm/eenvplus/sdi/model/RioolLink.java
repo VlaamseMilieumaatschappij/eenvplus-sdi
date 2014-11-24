@@ -1,10 +1,15 @@
 package be.vmm.eenvplus.sdi.model;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -43,6 +48,10 @@ public class RioolLink {
 	@NotNull
 	@Column(name = "sewerwatertypeid")
 	protected int sewerWaterType;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "rioollinkid")
+	protected List<RioolLinkStatus> statussen;
 
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@JsonSerialize(using = GeometrySerializer.class)
@@ -138,6 +147,14 @@ public class RioolLink {
 
 	public void setSewerWaterType(int sewerWaterType) {
 		this.sewerWaterType = sewerWaterType;
+	}
+
+	public List<RioolLinkStatus> getStatussen() {
+		return statussen;
+	}
+
+	public void setStatussen(List<RioolLinkStatus> statussen) {
+		this.statussen = statussen;
 	}
 
 	public Geometry getGeom() {

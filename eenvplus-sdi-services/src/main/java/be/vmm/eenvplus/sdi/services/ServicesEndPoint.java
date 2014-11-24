@@ -58,6 +58,13 @@ public class ServicesEndPoint {
 	@Inject
 	protected CrabGeoLocator geoLocator;
 
+	/**
+	 * This service provides configuration data for all the available map
+	 * topics.
+	 * 
+	 * @param lang
+	 *            The language.
+	 */
 	@GET
 	@Path("/")
 	@Produces("application/json")
@@ -67,9 +74,11 @@ public class ServicesEndPoint {
 	}
 
 	/**
-	 * This service provides metadata for all the available layers in the
-	 * GeoAdmin API.
+	 * This service provides metadata for all the available layers in the a map
+	 * topic.
 	 * 
+	 * @param mapId
+	 *            The map ID.
 	 * @param searchText
 	 *            The text to search for in the layer description.
 	 * @param lang
@@ -85,6 +94,13 @@ public class ServicesEndPoint {
 				getClass().getResourceAsStream("/settings/meta.json")).build();
 	}
 
+	/**
+	 * This service provides configuration data for all the available layers in
+	 * the a map topic.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 */
 	@GET
 	@Path("/{mapId}/MapServer/layersConfig")
 	@Produces("application/json")
@@ -94,6 +110,16 @@ public class ServicesEndPoint {
 				.build();
 	}
 
+	/**
+	 * This service is used to expose the attributes names that are specific to
+	 * a layer. This service is especially useful when combined wit h the find
+	 * service.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param layerBodId
+	 *            The layer ID (or technical name).
+	 */
 	@GET
 	@Path("/{mapId}/MapServer/{layerBodId}")
 	@Produces("application/json")
@@ -113,8 +139,10 @@ public class ServicesEndPoint {
 	}
 
 	/**
-	 * This service can be used to retrieve a legend.
+	 * This service can be used to retrieve a legend for a layer.
 	 * 
+	 * @param mapId
+	 *            The map ID.
 	 * @param layerBodId
 	 *            The layer ID (or technical name).
 	 * @param lang
@@ -135,6 +163,17 @@ public class ServicesEndPoint {
 		return templateHandler.evaluate("/templates/legend.fmt", null, params);
 	}
 
+	/**
+	 * With an ID and a layer ID (technical name), this service can be used to
+	 * retrieve a feature resource.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param layerBodId
+	 *            The layer ID (or technical name).
+	 * @param featureId
+	 *            The feature ID.
+	 */
 	@GET
 	@Path("/{mapId}/MapServer/{layerBodId}/{featureId}")
 	@Produces("application/json")
@@ -147,6 +186,18 @@ public class ServicesEndPoint {
 						featureId)));
 	}
 
+	/**
+	 * With an ID and a layer ID (technical name), this service can be used to
+	 * retrieve an html popup. An html popup is an html formatted representation
+	 * of the textual information about the feature.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param layerBodId
+	 *            The layer ID (or technical name).
+	 * @param featureId
+	 *            The feature ID.
+	 */
 	@GET
 	@Path("/{mapId}/MapServer/{layerBodId}/{featureId}/htmlPopup")
 	@Produces("application/xhtml+xml")
@@ -170,6 +221,18 @@ public class ServicesEndPoint {
 				params);
 	}
 
+	/**
+	 * With an ID and a layer ID (technical name), this service can be used to
+	 * retrieve an extended html popup. An html popup is an html formatted
+	 * representation of the textual information about the feature.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param layerBodId
+	 *            The layer ID (or technical name).
+	 * @param featureId
+	 *            The feature ID.
+	 */
 	@GET
 	@Path("/{mapId}/MapServer/{layerBodId}/{featureId}/exendedHtmlPopup")
 	@Produces("application/xhtml+xml")
@@ -193,6 +256,33 @@ public class ServicesEndPoint {
 				null, params);
 	}
 
+	/**
+	 * This service can be used to discover features at a specific location.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param geometry
+	 *            The geometry to identify on. The geometry is specified by the
+	 *            geometry type. This parameter is specified as a separated list
+	 *            of coordinates.
+	 * @param layers
+	 *            The layers to perform the identify operation on. Per default
+	 *            query all the layers. This is a comma separated list of
+	 *            technical layer names.
+	 * @param mapExtent
+	 *            The extent of the map. (minx, miny, maxx, maxy).
+	 * @param imageDisplay
+	 *            The screen image display parameters (width, height, and dpi)
+	 *            of the map. The mapExtent and the imageDisplay parameters are
+	 *            used by the server to calculate the the distance on the map to
+	 *            search based on the tolerance in screen pixels.
+	 * @param tolerance
+	 *            The tolerance in pixels around the specified geometry. This
+	 *            parameter is used to create a buffer around the geometry.
+	 *            Therefore, a tolerance of 0 deactivates the buffer creation.
+	 * @param lang
+	 *            The language (when available).
+	 */
 	@GET
 	@Path("/{mapId}/MapServer/identify")
 	@Produces("application/json")
@@ -236,26 +326,47 @@ public class ServicesEndPoint {
 		return new IdentifyResults<Object>(new FeatureList<Object>(results));
 	}
 
+	/**
+	 * This service is used to search the attributes of features. Each result
+	 * include a feature ID, a layer ID, a layer name, a geometry (optionally)
+	 * and attributes in the form of name-value pair. Here is a complete list of
+	 * layers for which this service is available.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 */
 	@GET
 	@Path("/{mapId}/MapServer/find")
 	@Produces("application/json")
 	public List<Object> find(@PathParam("mapId") String mapId) {
+		// TODO implement
 		return Collections.emptyList();
 	}
 
 	@GET
 	@Path("/{mapId}/MapServer/pull")
 	@Consumes("application/json")
-	public List<Object> pull() {
+	public List<Object> pull(@PathParam("mapId") String mapId) {
+		// TODO implement
 		return Collections.emptyList();
 	}
 
 	@POST
 	@Path("/{mapId}/MapServer/push")
 	@Consumes("application/json")
-	public void push(List<Object> features) {
+	public void push(@PathParam("mapId") String mapId, List<Object> features) {
+		// TODO implement
 	}
 
+	/**
+	 * This service provides summary metadata for all the available layers and
+	 * layer groups in the a map topic.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param lang
+	 *            The language.
+	 */
 	@GET
 	@Path("/{mapId}/CatalogServer")
 	@Produces("application/json")
@@ -266,13 +377,60 @@ public class ServicesEndPoint {
 				.build();
 	}
 
+	/**
+	 * <p>
+	 * The search service can be used to search for locations, layers or
+	 * features.
+	 * </p>
+	 * <p>
+	 * The search service is separated in 4 various categories or types:
+	 * </p>
+	 * 
+	 * <ul>
+	 * <li>The <strong>location search</strong> which is composed of the
+	 * following geocoded locations:
+	 * <ul>
+	 * <li>Cantons, Cities and communes</li>
+	 * <li>All names of communes</li>
+	 * <li>The names of provinces</li>
+	 * <li>The ZIP codes</li>
+	 * <li>The addresses</li>
+	 * <li>The cadastral parcels</li>
+	 * </ul>
+	 * </li>
+	 * <li>The <strong>layer search</strong> which enables the search of layers.
+	 * </li>
+	 * <li>The <strong>feature search</strong> which is used to search through
+	 * features descriptions.</li>
+	 * <li>The <strong>feature identify</strong> which is designed to
+	 * efficiently discover the features of a layer based on a geographic
+	 * extent.</li>
+	 * </ul>
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param searchText
+	 *            The text to search for.
+	 * @param type
+	 *            The type of performed search.
+	 * @param features
+	 *            A comma separated list of technical layer names.
+	 * @param bbox
+	 *            A comma separated list of 4 coordinates representing the
+	 *            bounding box on which features should be filtered (SRID:
+	 *            21781). If this parameter is defined, the ranking of the
+	 *            results is performed according to the distance between the
+	 *            locations and the center of the bounding box.
+	 * @param lang
+	 *            The language (when available).
+	 */
 	@GET
 	@Path("/{mapId}/SearchServer")
 	@Produces("application/json")
 	public SearchResults search(@PathParam("mapId") String mapId,
 			@QueryParam("searchText") String searchText,
 			@QueryParam("type") String type,
-			@QueryParam("features") String layers,
+			@QueryParam("features") String features,
 			@QueryParam("bbox") MapExtentParam bbox,
 			@QueryParam("lang") String lang) throws Exception {
 
@@ -285,7 +443,7 @@ public class ServicesEndPoint {
 
 			List<SearchResult> results = new ArrayList<SearchResult>();
 
-			for (String layerBodId : layers.split(",")) {
+			for (String layerBodId : features.split(",")) {
 				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
 				Class<Object> clazz = FeatureInfo.getFeatureClass(layerBodId);
@@ -307,12 +465,9 @@ public class ServicesEndPoint {
 					SearchResult result = new SearchResult();
 					result.setWeight(10);
 
-					// {"results":[{"id":3,"weight":1537,"attrs":{"origin":"feature","feature_id":"2","layer":"ch.bafu.fischerei-krebspest","@geodist":31630.279296875,"featureId":"2","lon":9.509796142578125,"geom_st_box2d":"BOX(757500 207800,757500 207800)","geom_quadindex":"030310013113133111313","lat":47.00254821777344,"label":"3"}}]}
-
 					result.setAttr("origin", "feature");
 					result.setAttr("layer", layerBodId);
 
-					result.setAttr("feature_id", item[0]);
 					result.setAttr("featureId", item[0]);
 
 					result.setAttr("label", item[0]);

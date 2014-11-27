@@ -360,8 +360,6 @@ public class ServicesEndPoint {
 		Root<Object> root = criteria.from(clazz);
 		criteria.select(root);
 
-		TypedQuery<Object> query = entityManager.createQuery(criteria);
-
 		if (extent != null) {
 			Geometry location = extent.getGeometry();
 			location.setSRID(31370);
@@ -372,8 +370,8 @@ public class ServicesEndPoint {
 					Boolean.TRUE));
 		}
 
+		TypedQuery<Object> query = entityManager.createQuery(criteria);
 		query.setMaxResults(100);
-
 		results.addAll(query.getResultList());
 
 		return new FeatureList<Object>(results);

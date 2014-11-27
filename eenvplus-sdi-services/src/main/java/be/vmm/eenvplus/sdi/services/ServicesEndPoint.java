@@ -33,13 +33,14 @@ import be.vmm.eenvplus.sdi.api.FeatureResult;
 import be.vmm.eenvplus.sdi.api.IdentifyResults;
 import be.vmm.eenvplus.sdi.api.SearchResult;
 import be.vmm.eenvplus.sdi.api.SearchResults;
+import be.vmm.eenvplus.sdi.api.json.ExtentParam;
 import be.vmm.eenvplus.sdi.api.json.Feature;
 import be.vmm.eenvplus.sdi.api.json.FeatureInfo;
 import be.vmm.eenvplus.sdi.api.json.FeatureList;
 import be.vmm.eenvplus.sdi.api.json.GeometryParam;
-import be.vmm.eenvplus.sdi.api.json.MapExtentParam;
 import be.vmm.eenvplus.sdi.api.json.ViewPortParam;
 import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
+import be.vmm.eenvplus.sdi.model.KoppelPunt;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -200,7 +201,7 @@ public class ServicesEndPoint {
 	 */
 	@GET
 	@Path("/{mapId}/MapServer/{layerBodId}/{featureId}/htmlPopup")
-	@Produces("application/xhtml+xml")
+	@Produces("text/html")
 	public String getHTMLPopup(@PathParam("mapId") String mapId,
 			@PathParam("layerBodId") String layerBodId,
 			@PathParam("featureId") Long featureId) throws IOException,
@@ -235,7 +236,7 @@ public class ServicesEndPoint {
 	 */
 	@GET
 	@Path("/{mapId}/MapServer/{layerBodId}/{featureId}/exendedHtmlPopup")
-	@Produces("application/xhtml+xml")
+	@Produces("text/html")
 	public String getExtendedHTMLPopup(@PathParam("mapId") String mapId,
 			@PathParam("layerBodId") String layerBodId,
 			@PathParam("featureId") Long featureId) throws IOException,
@@ -289,7 +290,7 @@ public class ServicesEndPoint {
 	public IdentifyResults<Object> identify(@PathParam("mapId") String mapId,
 			@BeanParam GeometryParam geometry,
 			@QueryParam("layers") String layers,
-			@QueryParam("mapExtent") MapExtentParam mapExtent,
+			@QueryParam("mapExtent") ExtentParam mapExtent,
 			@QueryParam("imageDisplay") ViewPortParam imageDisplay,
 			@QueryParam("tolerance") Integer tolerance,
 			@QueryParam("lang") String lang) throws ClassNotFoundException {
@@ -345,16 +346,52 @@ public class ServicesEndPoint {
 
 	@GET
 	@Path("/{mapId}/MapServer/pull")
-	@Consumes("application/json")
-	public List<Object> pull(@PathParam("mapId") String mapId) {
-		// TODO implement
-		return Collections.emptyList();
+	@Produces("application/json")
+	public List<Feature<Object>> pull(@PathParam("mapId") String mapId,
+			@QueryParam("extent") ExtentParam extent) {
+
+		List<Object> results = new ArrayList<Object>();
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		Class<Object> clazz = (Class) KoppelPunt.class;
+
+		CriteriaQuery<Object> criteria = builder.createQuery(clazz);
+		Root<Object> root = criteria.from(clazz);
+		criteria.select(root);
+
+		TypedQuery<Object> query = entityManager.createQuery(criteria);
+
+		if (extent != null) {
+			Geometry location = extent.getGeometry();
+			location.setSRID(31370);
+
+			criteria.where(builder.equal(
+					builder.function("intersects", Boolean.class,
+							root.get("geom"), builder.literal(location)),
+					Boolean.TRUE));
+		}
+
+		query.setMaxResults(100);
+
+		results.addAll(query.getResultList());
+
+		return new FeatureList<Object>(results);
 	}
 
 	@POST
 	@Path("/{mapId}/MapServer/push")
 	@Consumes("application/json")
-	public void push(@PathParam("mapId") String mapId, List<Object> features) {
+	public void push(@PathParam("mapId") String mapId,
+			List<Feature<Object>> features) {
+		// TODO implement
+	}
+
+	@POST
+	@Path("/{mapId}/MapServer/test")
+	@Consumes("application/json")
+	public void test(@PathParam("mapId") String mapId,
+			List<Feature<Object>> features) {
 		// TODO implement
 	}
 
@@ -430,7 +467,7 @@ public class ServicesEndPoint {
 			@QueryParam("searchText") String searchText,
 			@QueryParam("type") String type,
 			@QueryParam("features") String features,
-			@QueryParam("bbox") MapExtentParam bbox,
+			@QueryParam("bbox") ExtentParam bbox,
 			@QueryParam("lang") String lang) throws Exception {
 
 		if ("locations".equals(type)) {

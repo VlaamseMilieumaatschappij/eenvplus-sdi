@@ -34,24 +34,27 @@ public class RioolLink {
 	protected String alternatieveId;
 
 	@NotNull
-	@Column(name = "stengtypeid")
-	protected int stengType;
+	protected Long rioolLinkTypeId;
 	@NotNull
-	protected int startKoppelPuntId;
+	protected Long startKoppelPuntId;
 	@NotNull
-	protected int endKoppelPuntId;
+	protected Long endKoppelPuntId;
 	@NotNull
 	protected Double diameter;
 	protected Double pressure;
 	protected String label;
 	protected String omschrijving;
 	@NotNull
-	@Column(name = "sewerwatertypeid")
-	protected int sewerWaterType;
+	protected Long sewerWaterTypeId;
+
+	protected Long straatId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "rioollinkid")
 	protected List<RioolLinkStatus> statussen;
+
+	@NotNull
+	protected Long namespaceId;
 
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@JsonSerialize(using = GeometrySerializer.class)
@@ -85,27 +88,27 @@ public class RioolLink {
 		this.alternatieveId = alternatieveId;
 	}
 
-	public int getStengType() {
-		return stengType;
+	public Long getRioolLinkTypeId() {
+		return rioolLinkTypeId;
 	}
 
-	public void setStengType(int stengType) {
-		this.stengType = stengType;
+	public void setRioolLinkTypeId(Long rioolLinkTypeId) {
+		this.rioolLinkTypeId = rioolLinkTypeId;
 	}
 
-	public int getStartKoppelPuntId() {
+	public Long getStartKoppelPuntId() {
 		return startKoppelPuntId;
 	}
 
-	public void setStartKoppelPuntId(int startKoppelPuntId) {
+	public void setStartKoppelPuntId(Long startKoppelPuntId) {
 		this.startKoppelPuntId = startKoppelPuntId;
 	}
 
-	public int getEndKoppelPuntId() {
+	public Long getEndKoppelPuntId() {
 		return endKoppelPuntId;
 	}
 
-	public void setEndKoppelPuntId(int endKoppelPuntId) {
+	public void setEndKoppelPuntId(Long endKoppelPuntId) {
 		this.endKoppelPuntId = endKoppelPuntId;
 	}
 
@@ -141,12 +144,20 @@ public class RioolLink {
 		this.omschrijving = omschrijving;
 	}
 
-	public int getSewerWaterType() {
-		return sewerWaterType;
+	public Long getSewerWaterTypeId() {
+		return sewerWaterTypeId;
 	}
 
-	public void setSewerWaterType(int sewerWaterType) {
-		this.sewerWaterType = sewerWaterType;
+	public void setSewerWaterTypeId(Long sewerWaterTypeId) {
+		this.sewerWaterTypeId = sewerWaterTypeId;
+	}
+
+	public Long getStraatId() {
+		return straatId;
+	}
+
+	public void setStraatId(Long straatId) {
+		this.straatId = straatId;
 	}
 
 	public List<RioolLinkStatus> getStatussen() {
@@ -155,6 +166,14 @@ public class RioolLink {
 
 	public void setStatussen(List<RioolLinkStatus> statussen) {
 		this.statussen = statussen;
+	}
+
+	public Long getNamespaceId() {
+		return namespaceId;
+	}
+
+	public void setNamespaceId(Long namespaceId) {
+		this.namespaceId = namespaceId;
 	}
 
 	public Geometry getGeom() {

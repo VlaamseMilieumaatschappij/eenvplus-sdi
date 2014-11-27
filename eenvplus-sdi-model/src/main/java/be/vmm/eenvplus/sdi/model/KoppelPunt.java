@@ -27,6 +27,9 @@ public class KoppelPunt {
 	protected Date beginLifeSpanVersion;
 	protected String alternatieveId;
 
+	@NotNull
+	protected Long namespaceId;
+
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)
@@ -54,6 +57,14 @@ public class KoppelPunt {
 
 	public void setAlternatieveId(String alternatieveId) {
 		this.alternatieveId = alternatieveId;
+	}
+
+	public Long getNamespaceId() {
+		return namespaceId;
+	}
+
+	public void setNamespaceId(Long namespaceId) {
+		this.namespaceId = namespaceId;
 	}
 
 	public Geometry getGeom() {

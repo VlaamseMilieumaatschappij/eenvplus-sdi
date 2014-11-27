@@ -15,7 +15,7 @@ public class RioolLinkStatus {
 
 	@NotNull
 	@Column(name = "statusid")
-	protected int status;
+	protected Long statusId;
 
 	protected String geldigVanaf;
 	protected String geldigTot;
@@ -28,12 +28,12 @@ public class RioolLinkStatus {
 		this.id = id;
 	}
 
-	public int getStatus() {
-		return status;
+	public Long getStatusId() {
+		return statusId;
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public void setStatus(Long statusId) {
+		this.statusId = statusId;
 	}
 
 	public String getGeldigVanaf() {
@@ -54,7 +54,7 @@ public class RioolLinkStatus {
 
 	@Override
 	public String toString() {
-		return status + " (" + geldigVanaf
+		return statusId + " (" + geldigVanaf
 				+ (geldigTot != null ? "/" + geldigTot : "") + ")";
 	}
 }

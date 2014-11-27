@@ -1,6 +1,5 @@
 package be.vmm.eenvplus.sdi.model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -14,8 +13,7 @@ public class RioolAppurtenanceStatus {
 	protected Long id;
 
 	@NotNull
-	@Column(name = "statusid")
-	protected int status;
+	protected int statusId;
 
 	protected String geldigVanaf;
 	protected String geldigTot;
@@ -28,12 +26,12 @@ public class RioolAppurtenanceStatus {
 		this.id = id;
 	}
 
-	public int getStatus() {
-		return status;
+	public int getStatusId() {
+		return statusId;
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public void setStatusId(int statusId) {
+		this.statusId = statusId;
 	}
 
 	public String getGeldigVanaf() {
@@ -54,7 +52,7 @@ public class RioolAppurtenanceStatus {
 
 	@Override
 	public String toString() {
-		return status + " (" + geldigVanaf
+		return statusId + " (" + geldigVanaf
 				+ (geldigTot != null ? "/" + geldigTot : "") + ")";
 	}
 }

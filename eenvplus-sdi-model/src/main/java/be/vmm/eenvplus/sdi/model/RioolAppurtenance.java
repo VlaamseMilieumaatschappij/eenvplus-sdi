@@ -34,16 +34,21 @@ public class RioolAppurtenance {
 	protected String alternatieveId;
 
 	@NotNull
-	@Column(name = "appurtenancetypeid")
-	protected int appurtenanceType;
+	protected Long rioolAppurtenanceTypeId;
 	@NotNull
-	protected int koppelpuntId;
+	protected Long koppelpuntId;
 	protected String label;
 	protected String omschrijving;
+
+	protected Long vhaSegmentId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "rioolappurtenanceid")
 	protected List<RioolAppurtenanceStatus> statussen;
+
+	@NotNull
+	@Column(name = "namespaceid")
+	protected Long namespaceId;
 
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@JsonSerialize(using = GeometrySerializer.class)
@@ -77,19 +82,19 @@ public class RioolAppurtenance {
 		this.alternatieveId = alternatieveId;
 	}
 
-	public int getAppurtenanceType() {
-		return appurtenanceType;
+	public Long getRioolAppurtenanceTypeId() {
+		return rioolAppurtenanceTypeId;
 	}
 
-	public void setAppurtenanceType(int appurtenanceType) {
-		this.appurtenanceType = appurtenanceType;
+	public void setRioolAppurtenanceTypeId(Long rioolAppurtenanceTypeId) {
+		this.rioolAppurtenanceTypeId = rioolAppurtenanceTypeId;
 	}
 
-	public int getKoppelpuntId() {
+	public Long getKoppelpuntId() {
 		return koppelpuntId;
 	}
 
-	public void setKoppelpuntId(int koppelpuntId) {
+	public void setKoppelpuntId(Long koppelpuntId) {
 		this.koppelpuntId = koppelpuntId;
 	}
 
@@ -113,8 +118,24 @@ public class RioolAppurtenance {
 		return statussen;
 	}
 
+	public Long getVhaSegmentId() {
+		return vhaSegmentId;
+	}
+
+	public void setVhaSegmentId(Long vhaSegmentId) {
+		this.vhaSegmentId = vhaSegmentId;
+	}
+
 	public void setStatussen(List<RioolAppurtenanceStatus> statussen) {
 		this.statussen = statussen;
+	}
+
+	public Long getNamespaceId() {
+		return namespaceId;
+	}
+
+	public void setNamespaceId(Long namespaceId) {
+		this.namespaceId = namespaceId;
 	}
 
 	public Geometry getGeom() {

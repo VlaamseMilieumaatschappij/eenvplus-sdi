@@ -40,7 +40,6 @@ import be.vmm.eenvplus.sdi.api.json.FeatureList;
 import be.vmm.eenvplus.sdi.api.json.GeometryParam;
 import be.vmm.eenvplus.sdi.api.json.ViewPortParam;
 import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
-import be.vmm.eenvplus.sdi.model.KoppelPunt;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -348,31 +347,35 @@ public class ServicesEndPoint {
 	@Path("/{mapId}/MapServer/pull")
 	@Produces("application/json")
 	public List<Feature<Object>> pull(@PathParam("mapId") String mapId,
-			@QueryParam("extent") ExtentParam extent) {
+			@QueryParam("types") String types,
+			@QueryParam("extent") ExtentParam extent)
+			throws ClassNotFoundException {
 
 		List<Object> results = new ArrayList<Object>();
 
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
-		Class<Object> clazz = (Class) KoppelPunt.class;
+		for (String type : types.split(",")) {
+			Class<Object> clazz = (Class<Object>) Class.forName(type);
 
-		CriteriaQuery<Object> criteria = builder.createQuery(clazz);
-		Root<Object> root = criteria.from(clazz);
-		criteria.select(root);
+			CriteriaQuery<Object> criteria = builder.createQuery(clazz);
+			Root<Object> root = criteria.from(clazz);
+			criteria.select(root);
 
-		if (extent != null) {
-			Geometry location = extent.getGeometry();
-			location.setSRID(31370);
+			if (extent != null) {
+				Geometry location = extent.getGeometry();
+				location.setSRID(31370);
 
-			criteria.where(builder.equal(
-					builder.function("intersects", Boolean.class,
-							root.get("geom"), builder.literal(location)),
-					Boolean.TRUE));
+				criteria.where(builder.equal(
+						builder.function("intersects", Boolean.class,
+								root.get("geom"), builder.literal(location)),
+						Boolean.TRUE));
+			}
+
+			TypedQuery<Object> query = entityManager.createQuery(criteria);
+			query.setMaxResults(100);
+			results.addAll(query.getResultList());
 		}
-
-		TypedQuery<Object> query = entityManager.createQuery(criteria);
-		query.setMaxResults(100);
-		results.addAll(query.getResultList());
 
 		return new FeatureList<Object>(results);
 	}

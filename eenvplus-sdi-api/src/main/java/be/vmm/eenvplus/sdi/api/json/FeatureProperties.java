@@ -54,7 +54,7 @@ public class FeatureProperties<T> implements Map<String, Object> {
 			return new Iterator<Map.Entry<String, Object>>() {
 
 				Iterator<PropertyDescriptor> delegate = FeatureProperties.this
-						.getBeanInfo().getAttributeDescriptors().values()
+						.getBeanInfo().getPropertyDescriptors().values()
 						.iterator();
 
 				@Override
@@ -167,17 +167,17 @@ public class FeatureProperties<T> implements Map<String, Object> {
 
 	@Override
 	public int size() {
-		return getBeanInfo().getAttributeDescriptors().size();
+		return getPropertyDescriptors().size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return getBeanInfo().getAttributeDescriptors().isEmpty();
+		return getPropertyDescriptors().isEmpty();
 	}
 
 	@Override
 	public boolean containsKey(Object key) {
-		return getBeanInfo().getAttributeDescriptors().containsKey(key);
+		return getPropertyDescriptors().containsKey(key);
 	}
 
 	@Override
@@ -189,8 +189,8 @@ public class FeatureProperties<T> implements Map<String, Object> {
 	public Object get(Object key) {
 
 		try {
-			return getBeanInfo().getAttributeDescriptors().get(key)
-					.getReadMethod().invoke(object);
+			return getPropertyDescriptors().get(key).getReadMethod()
+					.invoke(object);
 		} catch (Exception e) {
 			return null;
 		}
@@ -200,8 +200,7 @@ public class FeatureProperties<T> implements Map<String, Object> {
 	public Object put(String key, Object value) {
 
 		try {
-			PropertyDescriptor descriptor = getBeanInfo()
-					.getAttributeDescriptors().get(key);
+			PropertyDescriptor descriptor = getPropertyDescriptors().get(key);
 			Object old = descriptor.getReadMethod().invoke(object);
 			descriptor.getWriteMethod().invoke(object, value);
 			return old;
@@ -214,8 +213,7 @@ public class FeatureProperties<T> implements Map<String, Object> {
 	public Object remove(Object key) {
 
 		try {
-			PropertyDescriptor descriptor = getBeanInfo()
-					.getAttributeDescriptors().get(key);
+			PropertyDescriptor descriptor = getPropertyDescriptors().get(key);
 			Object old = descriptor.getReadMethod().invoke(object);
 			descriptor.getWriteMethod().invoke(object, new Object[] { null });
 			return old;
@@ -236,8 +234,8 @@ public class FeatureProperties<T> implements Map<String, Object> {
 	public void clear() {
 
 		try {
-			for (PropertyDescriptor descriptor : getBeanInfo()
-					.getAttributeDescriptors().values()) {
+			for (PropertyDescriptor descriptor : getPropertyDescriptors()
+					.values()) {
 				descriptor.getWriteMethod().invoke(object,
 						new Object[] { null });
 			}
@@ -248,7 +246,7 @@ public class FeatureProperties<T> implements Map<String, Object> {
 
 	@Override
 	public Set<String> keySet() {
-		return getBeanInfo().getAttributeDescriptors().keySet();
+		return getPropertyDescriptors().keySet();
 	}
 
 	@Override
@@ -263,5 +261,9 @@ public class FeatureProperties<T> implements Map<String, Object> {
 
 	protected FeatureInfo getBeanInfo() {
 		return FeatureInfo.getFeatureInfo(object.getClass());
+	}
+
+	protected Map<String, PropertyDescriptor> getPropertyDescriptors() {
+		return getBeanInfo().getPropertyDescriptors();
 	}
 }

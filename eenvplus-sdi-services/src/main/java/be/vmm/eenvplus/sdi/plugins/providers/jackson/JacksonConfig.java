@@ -4,7 +4,6 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 @Provider
 public class JacksonConfig implements ContextResolver<ObjectMapper> {
@@ -14,7 +13,7 @@ public class JacksonConfig implements ContextResolver<ObjectMapper> {
 	public JacksonConfig() {
 
 		objectMapper = new ObjectMapper();
-		objectMapper.setDateFormat(new ISO8601DateFormat());
+		// objectMapper.setDateFormat(new ISO8601DateFormat());
 	}
 
 	@Override

@@ -17,6 +17,9 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -129,7 +132,7 @@ public class ServicesEndPoint {
 
 		Collection<PropertyDescriptor> descriptors = FeatureInfo
 				.getFeatureInfo(FeatureInfo.getFeatureClass(layerBodId))
-				.getAttributeDescriptors().values();
+				.getPropertyDescriptors().values();
 
 		List<String> description = new ArrayList<String>(descriptors.size());
 		for (PropertyDescriptor descriptor : descriptors) {
@@ -181,9 +184,13 @@ public class ServicesEndPoint {
 			@PathParam("layerBodId") String layerBodId,
 			@PathParam("featureId") Long featureId)
 			throws ClassNotFoundException {
-		return new FeatureResult<Object>(new Feature<Object>(
+
+		Object object = entityManager.find(
+				FeatureInfo.getFeatureClass(layerBodId), featureId);
+
+		return new FeatureResult<Object>(object != null ? new Feature<Object>(
 				entityManager.find(FeatureInfo.getFeatureClass(layerBodId),
-						featureId)));
+						featureId)) : null);
 	}
 
 	/**
@@ -383,17 +390,37 @@ public class ServicesEndPoint {
 	@POST
 	@Path("/{mapId}/MapServer/push")
 	@Consumes("application/json")
-	public void push(@PathParam("mapId") String mapId,
+	@Produces("application/json")
+	public List<String> push(@PathParam("mapId") String mapId,
 			List<Feature<Object>> features) {
-		// TODO implement
+		List<String> messages = test(mapId, features);
+
+		return messages;
 	}
 
 	@POST
 	@Path("/{mapId}/MapServer/test")
 	@Consumes("application/json")
-	public void test(@PathParam("mapId") String mapId,
+	@Produces("application/json")
+	public List<String> test(@PathParam("mapId") String mapId,
 			List<Feature<Object>> features) {
-		// TODO implement
+
+		ValidatorFactory validatorFactory = (ValidatorFactory) entityManager
+				.getEntityManagerFactory().getProperties()
+				.get("javax.persistence.validation.factory");
+
+		Validator validator = validatorFactory.getValidator();
+
+		List<String> messages = new ArrayList<String>();
+		for (Feature<Object> feature : features) {
+			for (ConstraintViolation<Object> violation : validator
+					.validate(feature.unwrap()))
+				messages.add(feature.getLayerBodId() + "#" + feature.getId()
+						+ " " + violation.getPropertyPath() + ": "
+						+ violation.getMessage());
+		}
+
+		return messages;
 	}
 
 	/**
@@ -525,5 +552,23 @@ public class ServicesEndPoint {
 		} else {
 			return new SearchResults();
 		}
+	}
+
+	@GET
+	@Path("/{mapId}/CodeServer/{type}")
+	@Produces("application/json")
+	public List<Object> search(@PathParam("mapId") String mapId,
+			@PathParam("type") String type) {
+
+		return null;
+	}
+
+	@GET
+	@Path("/{mapId}/CodeServer/{type}/{id}")
+	@Produces("application/json")
+	public Object search(@PathParam("mapId") String mapId,
+			@PathParam("type") String type, @PathParam("id") Long id) {
+
+		return null;
 	}
 }

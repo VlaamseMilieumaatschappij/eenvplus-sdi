@@ -9,11 +9,13 @@ import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Feature<T> {
 
 	protected T object;
@@ -27,17 +29,31 @@ public class Feature<T> {
 	public Feature(@JsonProperty("layerBodId") String layerBodId)
 			throws InstantiationException, IllegalAccessException,
 			ClassNotFoundException {
-		this.object = (T) FeatureInfo.getFeatureClass(layerBodId)
-				.newInstance();
+
+		if (layerBodId == null)
+			throw new NullPointerException("layerBodId");
+
+		this.object = (T) FeatureInfo.getFeatureClass(layerBodId).newInstance();
 	}
 
-	public Object getId() throws IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
-		return getBeanInfo().getIdDescriptor().getReadMethod().invoke(object);
+	public Long getId() {
+		try {
+			return (Long) getBeanInfo().getIdDescriptor().getReadMethod()
+					.invoke(object);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public Object getFeatureId() throws IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
+	public void setId(Long id) {
+		try {
+			getBeanInfo().getIdDescriptor().getWriteMethod().invoke(object, id);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public Object getFeatureId() {
 		return getId();
 	}
 
@@ -61,9 +77,12 @@ public class Feature<T> {
 
 		for (Map.Entry<String, Object> e : properties.entrySet()) {
 			Map<String, PropertyDescriptor> descriptors = getBeanInfo()
-					.getAttributeDescriptors();
-			descriptors.get(e.getKey()).getWriteMethod()
-					.invoke(object, e.getValue());
+					.getPropertyDescriptors();
+			PropertyDescriptor descriptor = descriptors.get(e.getKey());
+			descriptor.getWriteMethod()
+					.invoke(object,
+							Coercion.coerce(e.getValue(),
+									descriptor.getPropertyType()));
 		}
 	}
 
@@ -81,8 +100,8 @@ public class Feature<T> {
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
 
-		FeatureInfo.getFeatureInfo(object.getClass())
-				.getGeometryDescriptor().getWriteMethod().invoke(object, value);
+		FeatureInfo.getFeatureInfo(object.getClass()).getGeometryDescriptor()
+				.getWriteMethod().invoke(object, value);
 	}
 
 	@Override

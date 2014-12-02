@@ -20,7 +20,7 @@ public class FeatureInfo {
 		if (info == null) {
 			try {
 				PropertyDescriptor idDescriptor = null;
-				Map<String, PropertyDescriptor> attributeDescriptors = new LinkedHashMap<String, PropertyDescriptor>();
+				Map<String, PropertyDescriptor> propertyDescriptors = new LinkedHashMap<String, PropertyDescriptor>();
 				PropertyDescriptor geometryDescriptor = null;
 
 				BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
@@ -32,12 +32,12 @@ public class FeatureInfo {
 							.getPropertyType()) && geometryDescriptor == null) {
 						geometryDescriptor = descriptor;
 					} else if (!"class".equals(descriptor.getName())) {
-						attributeDescriptors.put(descriptor.getName(),
+						propertyDescriptors.put(descriptor.getName(),
 								descriptor);
 					}
 				}
 
-				info = new FeatureInfo(idDescriptor, attributeDescriptors,
+				info = new FeatureInfo(idDescriptor, propertyDescriptors,
 						geometryDescriptor);
 				cache.put(clazz, info);
 			} catch (Exception e) {
@@ -65,14 +65,14 @@ public class FeatureInfo {
 	}
 
 	protected PropertyDescriptor idDescriptor;
-	protected Map<String, PropertyDescriptor> attributeDescriptors;
+	protected Map<String, PropertyDescriptor> propertyDescriptors;
 	protected PropertyDescriptor geometryDescriptor;
 
 	public FeatureInfo(PropertyDescriptor idDescriptor,
-			Map<String, PropertyDescriptor> attributeDescriptors,
+			Map<String, PropertyDescriptor> propertyDescriptors,
 			PropertyDescriptor geometryDescriptor) {
 		this.idDescriptor = idDescriptor;
-		this.attributeDescriptors = attributeDescriptors;
+		this.propertyDescriptors = propertyDescriptors;
 		this.geometryDescriptor = geometryDescriptor;
 	}
 
@@ -80,8 +80,8 @@ public class FeatureInfo {
 		return idDescriptor;
 	}
 
-	public Map<String, PropertyDescriptor> getAttributeDescriptors() {
-		return attributeDescriptors;
+	public Map<String, PropertyDescriptor> getPropertyDescriptors() {
+		return propertyDescriptors;
 	}
 
 	public PropertyDescriptor getGeometryDescriptor() {

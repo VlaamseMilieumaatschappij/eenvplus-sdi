@@ -1,5 +1,7 @@
 package be.vmm.eenvplus.sdi.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -15,8 +17,9 @@ public class RioolAppurtenanceStatus {
 	@NotNull
 	protected int statusId;
 
-	protected String geldigVanaf;
-	protected String geldigTot;
+	@NotNull
+	protected Date geldigVanaf;
+	protected Date geldigTot;
 
 	public Long getId() {
 		return id;
@@ -34,19 +37,19 @@ public class RioolAppurtenanceStatus {
 		this.statusId = statusId;
 	}
 
-	public String getGeldigVanaf() {
+	public Date getGeldigVanaf() {
 		return geldigVanaf;
 	}
 
-	public void setGeldigVanaf(String geldigVanaf) {
+	public void setGeldigVanaf(Date geldigVanaf) {
 		this.geldigVanaf = geldigVanaf;
 	}
 
-	public String getGeldigTot() {
+	public Date getGeldigTot() {
 		return geldigTot;
 	}
 
-	public void setGeldigTot(String geldigTot) {
+	public void setGeldigTot(Date geldigTot) {
 		this.geldigTot = geldigTot;
 	}
 

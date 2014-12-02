@@ -54,6 +54,8 @@ public class ServicesEndPoint {
 
 	@PersistenceContext(unitName = "eenvplus")
 	protected EntityManager entityManager;
+	@Inject
+	protected ValidatorFactory validatorFactory;
 
 	@Inject
 	protected FreemarkerTemplateHandler templateHandler;
@@ -393,9 +395,21 @@ public class ServicesEndPoint {
 	@Produces("application/json")
 	public List<String> push(@PathParam("mapId") String mapId,
 			List<Feature<Object>> features) {
-		List<String> messages = test(mapId, features);
 
-		return messages;
+		List<String> messages = test(mapId, features);
+		if (!messages.isEmpty())
+			return messages;
+
+		for (Feature<Object> feature : features) {
+			Object object = feature.unwrap();
+			if (entityManager.contains(object)) {
+				entityManager.persist(object);
+			} else {
+				entityManager.merge(object);
+			}
+		}
+
+		return Collections.emptyList();
 	}
 
 	@POST
@@ -404,10 +418,6 @@ public class ServicesEndPoint {
 	@Produces("application/json")
 	public List<String> test(@PathParam("mapId") String mapId,
 			List<Feature<Object>> features) {
-
-		ValidatorFactory validatorFactory = (ValidatorFactory) entityManager
-				.getEntityManagerFactory().getProperties()
-				.get("javax.persistence.validation.factory");
 
 		Validator validator = validatorFactory.getValidator();
 
@@ -557,18 +567,31 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/CodeServer/{type}")
 	@Produces("application/json")
-	public List<Object> search(@PathParam("mapId") String mapId,
-			@PathParam("type") String type) {
+	public List<Object> getCodes(@PathParam("mapId") String mapId,
+			@PathParam("type") String type) throws ClassNotFoundException {
 
-		return null;
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+		Class<Object> clazz = (Class<Object>) Class.forName(type);
+
+		CriteriaQuery<Object> criteria = builder.createQuery(clazz);
+		Root<Object> root = criteria.from(clazz);
+		criteria.select(root);
+
+		TypedQuery<Object> query = entityManager.createQuery(criteria);
+
+		return query.getResultList();
 	}
 
 	@GET
 	@Path("/{mapId}/CodeServer/{type}/{id}")
 	@Produces("application/json")
-	public Object search(@PathParam("mapId") String mapId,
-			@PathParam("type") String type, @PathParam("id") Long id) {
+	public Object getCode(@PathParam("mapId") String mapId,
+			@PathParam("type") String type, @PathParam("id") Long id)
+			throws ClassNotFoundException {
 
-		return null;
+		Class<Object> clazz = (Class<Object>) Class.forName(type);
+
+		return entityManager.find(clazz, id);
 	}
 }

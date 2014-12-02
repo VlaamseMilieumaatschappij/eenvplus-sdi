@@ -6,10 +6,15 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
+import be.vmm.eenvplus.sdi.model.code.Namespace;
+import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
+import be.vmm.eenvplus.sdi.model.constraint.In;
+import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
 
@@ -20,20 +25,26 @@ import com.vividsolutions.jts.geom.Geometry;
 @Entity
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
+@Unique("alternatieveId")
 public class KoppelPunt {
 
 	@Id
 	protected Long id;
 
+	@Past
 	protected Date creationDate;
+	@Past
 	protected Date beginLifeSpanVersion;
+	@Past
 	protected Date endLifeSpanVersion;
 
 	protected String alternatieveId;
 
+	@In(entityType = Namespace.class)
 	protected Long namespaceId;
 
 	@NotNull
+	@GeometryType("Point")
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)

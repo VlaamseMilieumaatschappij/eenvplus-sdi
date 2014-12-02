@@ -8,8 +8,7 @@ import java.util.ListIterator;
 
 public class FeatureList<T> implements List<Feature<T>> {
 
-	public static class JsonFeatureIterator<T> implements
-			Iterator<Feature<T>> {
+	public static class JsonFeatureIterator<T> implements Iterator<Feature<T>> {
 
 		protected Iterator<T> iterator;
 
@@ -69,6 +68,19 @@ public class FeatureList<T> implements List<Feature<T>> {
 		public void add(Feature<T> e) {
 			((ListIterator<T>) iterator).add(e.unwrap());
 		}
+	}
+
+	public static <T> List<T> unwrap(List<Feature<T>> list) {
+
+		if (list instanceof FeatureList)
+			return ((FeatureList<T>) list).unwrap();
+
+		List<T> results = new ArrayList<T>(list.size());
+
+		for (Feature<T> item : list)
+			results.add(item.unwrap());
+
+		return results;
 	}
 
 	protected List<T> delegate;
@@ -281,5 +293,9 @@ public class FeatureList<T> implements List<Feature<T>> {
 	@Override
 	public List<Feature<T>> subList(int fromIndex, int toIndex) {
 		return new FeatureList<T>(delegate.subList(fromIndex, toIndex));
+	}
+
+	public List<T> unwrap() {
+		return delegate;
 	}
 }

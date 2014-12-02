@@ -1,9 +1,7 @@
 package be.vmm.eenvplus.sdi.api.json;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -26,7 +24,8 @@ public class Feature<T> {
 
 	@JsonCreator
 	@SuppressWarnings("unchecked")
-	public Feature(@JsonProperty("layerBodId") String layerBodId)
+	public Feature(
+			@JsonProperty(value = "layerBodId", required = true) String layerBodId)
 			throws InstantiationException, IllegalAccessException,
 			ClassNotFoundException {
 
@@ -65,25 +64,10 @@ public class Feature<T> {
 		return FeatureInfo.getLayerBodId(object.getClass());
 	}
 
-	public Map<String, Object> getProperties() throws IntrospectionException,
+	public FeatureProperties<T> getProperties() throws IntrospectionException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
 		return new FeatureProperties<T>(object);
-	}
-
-	public void setProperties(Map<String, Object> properties)
-			throws IntrospectionException, IllegalAccessException,
-			IllegalArgumentException, InvocationTargetException {
-
-		for (Map.Entry<String, Object> e : properties.entrySet()) {
-			Map<String, PropertyDescriptor> descriptors = getBeanInfo()
-					.getPropertyDescriptors();
-			PropertyDescriptor descriptor = descriptors.get(e.getKey());
-			descriptor.getWriteMethod()
-					.invoke(object,
-							Coercion.coerce(e.getValue(),
-									descriptor.getPropertyType()));
-		}
 	}
 
 	@JsonSerialize(using = GeometrySerializer.class)
@@ -123,7 +107,12 @@ public class Feature<T> {
 		return object;
 	}
 
+	@SuppressWarnings("unchecked")
+	protected Class<T> getObjectClass() {
+		return (Class<T>) object.getClass();
+	}
+
 	protected FeatureInfo getBeanInfo() {
-		return FeatureInfo.getFeatureInfo(object.getClass());
+		return FeatureInfo.getFeatureInfo(getObjectClass());
 	}
 }

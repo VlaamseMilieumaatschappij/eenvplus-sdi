@@ -6,6 +6,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import be.vmm.eenvplus.sdi.plugins.providers.jackson.FeaturePropertiesDeserializer;
+import be.vmm.eenvplus.sdi.plugins.providers.jackson.FeaturePropertiesSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+@JsonSerialize(using = FeaturePropertiesSerializer.class)
+@JsonDeserialize(using = FeaturePropertiesDeserializer.class)
 public class FeatureProperties<T> implements Map<String, Object> {
 
 	public class JsonFeaturePropertiesEntrySet implements
@@ -259,8 +267,17 @@ public class FeatureProperties<T> implements Map<String, Object> {
 		return new JsonFeaturePropertiesEntrySet();
 	}
 
+	public T unwrap() {
+		return object;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected Class<T> getObjectClass() {
+		return (Class<T>) object.getClass();
+	}
+
 	protected FeatureInfo getBeanInfo() {
-		return FeatureInfo.getFeatureInfo(object.getClass());
+		return FeatureInfo.getFeatureInfo(getObjectClass());
 	}
 
 	protected Map<String, PropertyDescriptor> getPropertyDescriptors() {

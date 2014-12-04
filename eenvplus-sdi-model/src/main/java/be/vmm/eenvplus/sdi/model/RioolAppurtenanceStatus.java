@@ -7,6 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import be.vmm.eenvplus.sdi.model.code.Status;
+import be.vmm.eenvplus.sdi.model.constraint.In;
+
 @Entity
 @Table(name = "rioolappurtenance_status", schema = "gengis")
 public class RioolAppurtenanceStatus {
@@ -15,7 +18,8 @@ public class RioolAppurtenanceStatus {
 	protected Long id;
 
 	@NotNull
-	protected int statusId;
+	@In(entityType = Status.class)
+	protected Long statusId;
 
 	@NotNull
 	protected Date geldigVanaf;
@@ -29,11 +33,11 @@ public class RioolAppurtenanceStatus {
 		this.id = id;
 	}
 
-	public int getStatusId() {
+	public Long getStatusId() {
 		return statusId;
 	}
 
-	public void setStatusId(int statusId) {
+	public void setStatusId(Long statusId) {
 		this.statusId = statusId;
 	}
 

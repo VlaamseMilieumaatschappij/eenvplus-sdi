@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Entity
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
-@Unique("alternatieveId")
+@Unique({ "namespaceId", "alternatieveId" })
 @Static("rioolAppurtenanceTypeId")
 public class RioolAppurtenance {
 
@@ -64,7 +64,6 @@ public class RioolAppurtenance {
 	@JoinColumn(name = "rioolappurtenanceid")
 	protected List<RioolAppurtenanceStatus> statussen;
 
-	@Column(name = "namespaceid")
 	@In(entityType = Namespace.class)
 	protected Long namespaceId;
 

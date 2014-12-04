@@ -7,6 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import be.vmm.eenvplus.sdi.model.code.Status;
+import be.vmm.eenvplus.sdi.model.constraint.In;
+
 @Entity
 @Table(name = "rioollink_status", schema = "gengis")
 public class RioolLinkStatus {
@@ -15,6 +18,7 @@ public class RioolLinkStatus {
 	protected Long id;
 
 	@NotNull
+	@In(entityType = Status.class)
 	protected Long statusId;
 
 	@NotNull

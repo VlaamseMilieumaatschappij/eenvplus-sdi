@@ -2,6 +2,7 @@ package be.vmm.eenvplus.sdi.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -25,7 +26,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Entity
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
-@Unique("alternatieveId")
+@Unique({ "namespaceId", "alternatieveId" })
 public class KoppelPunt {
 
 	@Id
@@ -49,6 +50,9 @@ public class KoppelPunt {
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)
 	protected Geometry geom;
+
+	@Column(name = "user_id")
+	protected String userId;
 
 	public Long getId() {
 		return id;
@@ -104,5 +108,13 @@ public class KoppelPunt {
 
 	public void setGeom(Geometry geom) {
 		this.geom = geom;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

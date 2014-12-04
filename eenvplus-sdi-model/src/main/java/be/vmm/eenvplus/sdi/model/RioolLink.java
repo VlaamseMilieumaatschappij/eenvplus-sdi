@@ -23,7 +23,6 @@ import be.vmm.eenvplus.sdi.model.code.RioolLinkType;
 import be.vmm.eenvplus.sdi.model.code.SewerWaterType;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
 import be.vmm.eenvplus.sdi.model.constraint.In;
-import be.vmm.eenvplus.sdi.model.constraint.Static;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -35,8 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Entity
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
-@Unique("alternatieveId")
-@Static("rioolLinkTypeId")
+@Unique({ "namespaceId", "alternatieveId" })
 public class RioolLink {
 
 	@Id

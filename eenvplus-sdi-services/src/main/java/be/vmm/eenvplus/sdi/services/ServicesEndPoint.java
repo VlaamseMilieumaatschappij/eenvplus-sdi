@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -34,8 +35,16 @@ import org.geotools.referencing.CRS;
 
 import be.vmm.eenvplus.sdi.api.FeatureResult;
 import be.vmm.eenvplus.sdi.api.IdentifyResults;
+import be.vmm.eenvplus.sdi.api.ModificationAction;
+import be.vmm.eenvplus.sdi.api.ModificationReport;
+import be.vmm.eenvplus.sdi.api.ModificationResult;
+import be.vmm.eenvplus.sdi.api.ModifiedFeature;
 import be.vmm.eenvplus.sdi.api.SearchResult;
 import be.vmm.eenvplus.sdi.api.SearchResults;
+import be.vmm.eenvplus.sdi.api.ValidationLevel;
+import be.vmm.eenvplus.sdi.api.ValidationMessage;
+import be.vmm.eenvplus.sdi.api.ValidationReport;
+import be.vmm.eenvplus.sdi.api.ValidationResult;
 import be.vmm.eenvplus.sdi.api.json.ExtentParam;
 import be.vmm.eenvplus.sdi.api.json.Feature;
 import be.vmm.eenvplus.sdi.api.json.FeatureInfo;
@@ -393,44 +402,81 @@ public class ServicesEndPoint {
 	@Path("/{mapId}/MapServer/push")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public List<String> push(@PathParam("mapId") String mapId,
-			List<Feature<Object>> features) {
+	public ModificationReport push(@PathParam("mapId") String mapId,
+			List<ModifiedFeature<Object>> features) {
 
-		List<String> messages = test(mapId, features);
-		if (!messages.isEmpty())
-			return messages;
+		ValidationReport validation = test(mapId, features);
+		if (!validation.isValid()) {
+			return new ModificationReport(false, validation);
+		}
 
-		for (Feature<Object> feature : features) {
+		boolean completed = true;
+		List<ModificationResult> results = new ArrayList<ModificationResult>(
+				features.size());
+
+		for (ModifiedFeature<Object> feature : features) {
 			Object object = feature.unwrap();
-			if (entityManager.contains(object)) {
+			Long key = feature.getKey();
+			ModificationAction action = feature.getAction();
+
+			switch (action) {
+			case create:
 				entityManager.persist(object);
-			} else {
+				results.add(new ModificationResult(key,
+						ModificationAction.create, new Feature<Object>(object)));
+				break;
+			case update:
 				entityManager.merge(object);
+				results.add(new ModificationResult(key,
+						ModificationAction.update, new Feature<Object>(object)));
+				break;
+			case delete:
+				entityManager.remove(object);
+				results.add(new ModificationResult(key,
+						ModificationAction.delete));
+				break;
+			default:
+				results.add(new ModificationResult(key, ModificationAction.none));
 			}
 		}
 
-		return Collections.emptyList();
+		return new ModificationReport(completed, validation, results);
 	}
 
 	@POST
 	@Path("/{mapId}/MapServer/test")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public List<String> test(@PathParam("mapId") String mapId,
-			List<Feature<Object>> features) {
+	public ValidationReport test(@PathParam("mapId") String mapId,
+			List<ModifiedFeature<Object>> features) {
+
+		boolean valid = true;
+		List<ValidationResult> results = new ArrayList<ValidationResult>(
+				features.size());
 
 		Validator validator = validatorFactory.getValidator();
 
-		List<String> messages = new ArrayList<String>();
-		for (Feature<Object> feature : features) {
-			for (ConstraintViolation<Object> violation : validator
-					.validate(feature.unwrap()))
-				messages.add(feature.getLayerBodId() + "#" + feature.getId()
-						+ " " + violation.getPropertyPath() + ": "
-						+ violation.getMessage());
+		for (ModifiedFeature<Object> feature : features) {
+			Set<ConstraintViolation<Object>> violations = validator
+					.validate(feature.unwrap());
+			if (violations.size() > 0) {
+				List<ValidationMessage> messages = new ArrayList<ValidationMessage>();
+				for (ConstraintViolation<Object> violation : validator
+						.validate(feature.unwrap())) {
+					messages.add(new ValidationMessage(ValidationLevel.error,
+							violation.getPropertyPath().toString(), violation
+									.getMessage()));
+				}
+
+				valid = false;
+				results.add(new ValidationResult(feature.getKey(), false,
+						messages));
+			} else {
+				results.add(new ValidationResult(feature.getKey(), true));
+			}
 		}
 
-		return messages;
+		return new ValidationReport(valid, results);
 	}
 
 	/**

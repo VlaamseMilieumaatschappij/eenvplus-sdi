@@ -1,17 +1,19 @@
 package be.vmm.eenvplus.sdi.model.code;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "gengis")
-public class SewerWaterType {
+public class SewerWaterType implements Code {
 
 	@Id
 	protected Long id;
 
-	protected String sewerWaterType;
+	@Column(name = "sewerWaterType")
+	protected String label;
 
 	public Long getId() {
 		return id;
@@ -21,11 +23,11 @@ public class SewerWaterType {
 		this.id = id;
 	}
 
-	public String getSewerWaterType() {
-		return sewerWaterType;
+	public String getLabel() {
+		return label;
 	}
 
-	public void setSewerWaterType(String sewerWaterType) {
-		this.sewerWaterType = sewerWaterType;
+	public void setLabel(String sewerWaterType) {
+		this.label = sewerWaterType;
 	}
 }

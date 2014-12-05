@@ -1,17 +1,19 @@
 package be.vmm.eenvplus.sdi.model.code;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "gengis")
-public class Status {
+public class Status implements Code {
 
 	@Id
 	protected Long id;
 
-	protected String status;
+	@Column(name = "status")
+	protected String label;
 
 	public Long getId() {
 		return id;
@@ -21,11 +23,11 @@ public class Status {
 		this.id = id;
 	}
 
-	public String getStatus() {
-		return status;
+	public String getLabel() {
+		return label;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setLabel(String status) {
+		this.label = status;
 	}
 }

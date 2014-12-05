@@ -1,17 +1,19 @@
 package be.vmm.eenvplus.sdi.model.code;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "gengis")
-public class Namespace {
+public class Namespace implements Code {
 
 	@Id
 	protected Long id;
 
-	protected String namespace;
+	@Column(name = "namespace")
+	protected String label;
 
 	public Long getId() {
 		return id;
@@ -21,11 +23,11 @@ public class Namespace {
 		this.id = id;
 	}
 
-	public String getNamespace() {
-		return namespace;
+	public String getLabel() {
+		return label;
 	}
 
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
+	public void setLabel(String namespace) {
+		this.label = namespace;
 	}
 }

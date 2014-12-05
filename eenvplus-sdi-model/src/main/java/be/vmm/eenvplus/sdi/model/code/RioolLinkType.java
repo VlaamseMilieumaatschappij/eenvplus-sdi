@@ -1,17 +1,19 @@
 package be.vmm.eenvplus.sdi.model.code;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "gengis")
-public class RioolLinkType {
+public class RioolLinkType implements Code {
 
 	@Id
 	protected Long id;
 
-	protected String rioolLinkType;
+	@Column(name = "rioolLinkType")
+	protected String label;
 
 	public Long getId() {
 		return id;
@@ -21,11 +23,11 @@ public class RioolLinkType {
 		this.id = id;
 	}
 
-	public String getRioolLinkType() {
-		return rioolLinkType;
+	public String getLabel() {
+		return label;
 	}
 
-	public void setRioolLinkType(String rioolLinkType) {
-		this.rioolLinkType = rioolLinkType;
+	public void setLabel(String rioolLinkType) {
+		this.label = rioolLinkType;
 	}
 }

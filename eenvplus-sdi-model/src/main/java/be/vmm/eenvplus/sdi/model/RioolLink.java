@@ -1,7 +1,9 @@
 package be.vmm.eenvplus.sdi.model;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -23,8 +25,13 @@ import org.hibernate.annotations.Where;
 import be.vmm.eenvplus.sdi.model.code.Namespace;
 import be.vmm.eenvplus.sdi.model.code.RioolLinkType;
 import be.vmm.eenvplus.sdi.model.code.SewerWaterType;
+import be.vmm.eenvplus.sdi.model.constraint.AssertQuery;
+import be.vmm.eenvplus.sdi.model.constraint.AssertQuery.AssertQueryCondition;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
-import be.vmm.eenvplus.sdi.model.constraint.In;
+import be.vmm.eenvplus.sdi.model.constraint.NodePosition;
+import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
+import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
+import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -53,7 +60,7 @@ public class RioolLink implements RioolObject {
 	protected String alternatieveId;
 
 	@NotNull
-	@In(entityType = RioolLinkType.class)
+	@Refers(entityType = RioolLinkType.class)
 	protected Long rioolLinkTypeId;
 	@NotNull
 	protected Long startKoppelPuntId;
@@ -66,7 +73,7 @@ public class RioolLink implements RioolObject {
 	protected String label;
 	protected String omschrijving;
 	@NotNull
-	@In(entityType = SewerWaterType.class)
+	@Refers(entityType = SewerWaterType.class)
 	protected Long sewerWaterTypeId;
 
 	protected Long straatId;
@@ -77,7 +84,7 @@ public class RioolLink implements RioolObject {
 	@JoinColumn(name = "rioollinkid")
 	protected List<RioolLinkStatus> statussen;
 
-	@In(entityType = Namespace.class)
+	@Refers(entityType = Namespace.class)
 	protected Long namespaceId;
 
 	@NotNull
@@ -232,5 +239,43 @@ public class RioolLink implements RioolObject {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	@RefersNode(nodePosition = NodePosition.start, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01)
+	protected NodeValue getStartKoppelPuntReference() {
+		return new NodeValue(startKoppelPuntId, geom);
+	}
+
+	@RefersNode(nodePosition = NodePosition.end, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01)
+	protected NodeValue getEndKoppelPuntReference() {
+		return new NodeValue(startKoppelPuntId, geom);
+	}
+
+	@AssertQuery(value = {
+			"SELECT count(l) = 0 FROM RioolLink l WHERE rioolLinkTypeId = 2 AND (l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId)",
+			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
+	protected Map<String, Object> getCheckStartPersleidingParams() {
+
+		if (rioolLinkTypeId == 2L/* persleiding */) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("koppelpuntId", startKoppelPuntId);
+			return params;
+		}
+
+		return null;
+	}
+
+	@AssertQuery(value = {
+			"SELECT count(l) = 0 FROM RioolLink l WHERE rioolLinkTypeId = 2 AND (l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId)",
+			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
+	protected Map<String, Object> getCheckEndPersleidingParams() {
+
+		if (rioolLinkTypeId == 2L/* persleiding */) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("koppelpuntId", endKoppelPuntId);
+			return params;
+		}
+
+		return null;
 	}
 }

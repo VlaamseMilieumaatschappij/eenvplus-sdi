@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.SynchronizationType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -20,7 +21,7 @@ import javax.validation.ConstraintValidatorContext;
 
 public class UniqueValidator implements ConstraintValidator<Unique, Object> {
 
-	@PersistenceContext(unitName = "eenvplus")
+	@PersistenceContext(unitName = "eenvplus", synchronization = SynchronizationType.UNSYNCHRONIZED)
 	protected EntityManager entityManager;
 
 	protected String[] propertyNames;

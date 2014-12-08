@@ -1,7 +1,9 @@
 package be.vmm.eenvplus.sdi.model;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,9 +23,12 @@ import org.hibernate.annotations.Where;
 
 import be.vmm.eenvplus.sdi.model.code.Namespace;
 import be.vmm.eenvplus.sdi.model.code.RioolAppurtenanceType;
+import be.vmm.eenvplus.sdi.model.constraint.AssertQuery;
 import be.vmm.eenvplus.sdi.model.constraint.GeometrySimple;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
-import be.vmm.eenvplus.sdi.model.constraint.In;
+import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
+import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
+import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.Static;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
@@ -54,7 +59,7 @@ public class RioolAppurtenance implements RioolObject {
 	protected String alternatieveId;
 
 	@NotNull
-	@In(entityType = RioolAppurtenanceType.class)
+	@Refers(entityType = RioolAppurtenanceType.class)
 	protected Long rioolAppurtenanceTypeId;
 	@NotNull
 	protected Long koppelpuntId;
@@ -69,7 +74,7 @@ public class RioolAppurtenance implements RioolObject {
 	@JoinColumn(name = "rioolappurtenanceid")
 	protected List<RioolAppurtenanceStatus> statussen;
 
-	@In(entityType = Namespace.class)
+	@Refers(entityType = Namespace.class)
 	protected Long namespaceId;
 
 	@NotNull
@@ -193,5 +198,22 @@ public class RioolAppurtenance implements RioolObject {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	@RefersNode(nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 5)
+	protected NodeValue getKoppelPuntReference() {
+		return new NodeValue(koppelpuntId, geom);
+	}
+
+	@AssertQuery("SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId")
+	protected Map<String, Object> getCheckUitlaatParams() {
+
+		if (rioolAppurtenanceTypeId == 6L/* dischargeStructure */) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("koppelpuntId", koppelpuntId);
+			return params;
+		}
+
+		return null;
 	}
 }

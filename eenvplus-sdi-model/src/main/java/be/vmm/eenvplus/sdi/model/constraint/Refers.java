@@ -14,11 +14,11 @@ import javax.validation.Payload;
 
 @Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = InValidator.class)
+@Constraint(validatedBy = RefersValidator.class)
 @Documented
-public @interface In {
+public @interface Refers {
 
-	String message() default "{be.vmm.constraints.in}";
+	String message() default "{be.vmm.constraints.refers}";
 
 	Class<?>[] groups() default {};
 

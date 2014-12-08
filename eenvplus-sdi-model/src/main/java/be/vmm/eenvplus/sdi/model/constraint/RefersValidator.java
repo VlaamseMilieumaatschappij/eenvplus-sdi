@@ -2,18 +2,19 @@ package be.vmm.eenvplus.sdi.model.constraint;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.SynchronizationType;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class InValidator implements ConstraintValidator<In, Object> {
+public class RefersValidator implements ConstraintValidator<Refers, Object> {
 
-	@PersistenceContext(unitName = "eenvplus")
+	@PersistenceContext(unitName = "eenvplus", synchronization = SynchronizationType.UNSYNCHRONIZED)
 	protected EntityManager entityManager;
 
 	protected Class<?> entityType;
 
 	@Override
-	public void initialize(In annotation) {
+	public void initialize(Refers annotation) {
 		entityType = annotation.entityType();
 	}
 

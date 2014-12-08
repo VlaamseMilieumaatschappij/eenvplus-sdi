@@ -15,7 +15,7 @@ import org.hibernate.annotations.Where;
 
 import be.vmm.eenvplus.sdi.model.code.Namespace;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
-import be.vmm.eenvplus.sdi.model.constraint.In;
+import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -43,7 +43,7 @@ public class KoppelPunt implements RioolObject {
 
 	protected String alternatieveId;
 
-	@In(entityType = Namespace.class)
+	@Refers(entityType = Namespace.class)
 	protected Long namespaceId;
 
 	@NotNull

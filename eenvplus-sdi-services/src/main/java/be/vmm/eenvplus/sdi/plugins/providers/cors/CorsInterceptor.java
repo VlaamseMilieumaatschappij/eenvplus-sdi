@@ -1,4 +1,4 @@
-package be.vmm.eenvplus.sdi.plugins.providers.jackson;
+package be.vmm.eenvplus.sdi.plugins.providers.cors;
 
 import java.io.IOException;
 
@@ -57,7 +57,7 @@ public class CorsInterceptor implements MessageBodyWriterInterceptor {
 
 		context.getHeaders().add(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
 		context.getHeaders().add(ACCESS_CONTROL_ALLOW_METHODS,
-				"GET, POST, PUT, DELETE");
+				"GET, POST, PUT, DELETE, OPTIONS, HEAD");
 
 		context.proceed();
 	}

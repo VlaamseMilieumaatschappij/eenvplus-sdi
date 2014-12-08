@@ -27,7 +27,7 @@ public class RioolLinkType implements Code {
 		return label;
 	}
 
-	public void setLabel(String rioolLinkType) {
-		this.label = rioolLinkType;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

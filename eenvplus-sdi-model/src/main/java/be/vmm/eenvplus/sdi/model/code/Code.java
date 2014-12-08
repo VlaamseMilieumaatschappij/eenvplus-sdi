@@ -8,6 +8,5 @@ public interface Code {
 
     public String getLabel();
 
-    public void setLabel(String namespace);
-
+    public void setLabel(String label);
 }

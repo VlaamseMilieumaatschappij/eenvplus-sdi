@@ -27,7 +27,7 @@ public class Namespace implements Code {
 		return label;
 	}
 
-	public void setLabel(String namespace) {
-		this.label = namespace;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

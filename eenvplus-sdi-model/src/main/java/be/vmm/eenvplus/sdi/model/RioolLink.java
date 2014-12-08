@@ -11,10 +11,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
@@ -34,8 +36,9 @@ import com.vividsolutions.jts.geom.Geometry;
 @Entity
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
+@SQLDelete(sql = "UPDATE gengis.RioolLink SET endLifeSpanVersion = now() WHERE id = ?")
 @Unique({ "namespaceId", "alternatieveId" })
-public class RioolLink {
+public class RioolLink implements RioolObject {
 
 	@Id
 	protected Long id;
@@ -68,7 +71,9 @@ public class RioolLink {
 
 	protected Long straatId;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@Valid
+	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+			CascadeType.REFRESH, CascadeType.DETACH }, fetch = FetchType.EAGER)
 	@JoinColumn(name = "rioollinkid")
 	protected List<RioolLinkStatus> statussen;
 

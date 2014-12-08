@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import be.vmm.eenvplus.sdi.api.json.FeatureList;
 import be.vmm.eenvplus.sdi.api.json.GeometryParam;
 import be.vmm.eenvplus.sdi.api.json.ViewPortParam;
 import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
+import be.vmm.eenvplus.sdi.model.RioolObject;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -403,34 +405,40 @@ public class ServicesEndPoint {
 	@Consumes("application/json")
 	@Produces("application/json")
 	public ModificationReport push(@PathParam("mapId") String mapId,
-			List<ModifiedFeature<Object>> features) {
+			List<ModifiedFeature<RioolObject>> features) {
 
 		ValidationReport validation = test(mapId, features);
 		if (!validation.isValid()) {
 			return new ModificationReport(false, validation);
 		}
 
+		Date date = new Date();
+
 		boolean completed = true;
 		List<ModificationResult> results = new ArrayList<ModificationResult>(
 				features.size());
 
-		for (ModifiedFeature<Object> feature : features) {
-			Object object = feature.unwrap();
+		for (ModifiedFeature<RioolObject> feature : features) {
+			RioolObject object = feature.unwrap();
 			Long key = feature.getKey();
 			ModificationAction action = feature.getAction();
 
 			switch (action) {
 			case create:
+				object.setCreationDate(date);
+				object.setBeginLifeSpanVersion(date);
 				entityManager.persist(object);
 				results.add(new ModificationResult(key,
 						ModificationAction.create, new Feature<Object>(object)));
 				break;
 			case update:
+				object.setBeginLifeSpanVersion(date);
 				entityManager.merge(object);
 				results.add(new ModificationResult(key,
 						ModificationAction.update, new Feature<Object>(object)));
 				break;
 			case delete:
+				// Does a soft delete by setting endLifeSpanVersion
 				entityManager.remove(object);
 				results.add(new ModificationResult(key,
 						ModificationAction.delete));
@@ -448,7 +456,7 @@ public class ServicesEndPoint {
 	@Consumes("application/json")
 	@Produces("application/json")
 	public ValidationReport test(@PathParam("mapId") String mapId,
-			List<ModifiedFeature<Object>> features) {
+			List<ModifiedFeature<RioolObject>> features) {
 
 		boolean valid = true;
 		List<ValidationResult> results = new ArrayList<ValidationResult>(
@@ -456,12 +464,12 @@ public class ServicesEndPoint {
 
 		Validator validator = validatorFactory.getValidator();
 
-		for (ModifiedFeature<Object> feature : features) {
-			Set<ConstraintViolation<Object>> violations = validator
+		for (ModifiedFeature<RioolObject> feature : features) {
+			Set<ConstraintViolation<RioolObject>> violations = validator
 					.validate(feature.unwrap());
 			if (violations.size() > 0) {
 				List<ValidationMessage> messages = new ArrayList<ValidationMessage>();
-				for (ConstraintViolation<Object> violation : validator
+				for (ConstraintViolation<RioolObject> violation : validator
 						.validate(feature.unwrap())) {
 					messages.add(new ValidationMessage(ValidationLevel.error,
 							violation.getPropertyPath().toString(), violation

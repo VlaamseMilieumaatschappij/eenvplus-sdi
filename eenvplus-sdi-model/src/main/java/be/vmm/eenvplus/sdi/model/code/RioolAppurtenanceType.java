@@ -27,7 +27,7 @@ public class RioolAppurtenanceType implements Code {
 		return label;
 	}
 
-	public void setLabel(String rioolAppurtenanceType) {
-		this.label = rioolAppurtenanceType;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

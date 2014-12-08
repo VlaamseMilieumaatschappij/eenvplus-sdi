@@ -27,7 +27,7 @@ public class SewerWaterType implements Code {
 		return label;
 	}
 
-	public void setLabel(String sewerWaterType) {
-		this.label = sewerWaterType;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

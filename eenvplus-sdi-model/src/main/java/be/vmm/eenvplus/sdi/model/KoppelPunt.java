@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
@@ -26,8 +27,9 @@ import com.vividsolutions.jts.geom.Geometry;
 @Entity
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
+@SQLDelete(sql = "UPDATE gengis.KoppelPunt SET endLifeSpanVersion = now() WHERE id = ?")
 @Unique({ "namespaceId", "alternatieveId" })
-public class KoppelPunt {
+public class KoppelPunt implements RioolObject {
 
 	@Id
 	protected Long id;

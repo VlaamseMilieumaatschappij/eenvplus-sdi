@@ -21,7 +21,6 @@ public class RioolAppurtenanceStatus {
 	@In(entityType = Status.class)
 	protected Long statusId;
 
-	@NotNull
 	protected Date geldigVanaf;
 	protected Date geldigTot;
 

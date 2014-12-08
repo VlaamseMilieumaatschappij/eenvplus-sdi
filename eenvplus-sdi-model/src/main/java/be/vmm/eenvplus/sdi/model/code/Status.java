@@ -27,7 +27,7 @@ public class Status implements Code {
 		return label;
 	}
 
-	public void setLabel(String status) {
-		this.label = status;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

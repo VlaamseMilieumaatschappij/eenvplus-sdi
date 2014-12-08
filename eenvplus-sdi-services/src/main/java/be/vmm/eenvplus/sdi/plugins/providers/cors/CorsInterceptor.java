@@ -58,7 +58,8 @@ public class CorsInterceptor implements MessageBodyWriterInterceptor {
 		context.getHeaders().add(ACCESS_CONTROL_ALLOW_ORIGIN, "*");
 		context.getHeaders().add(ACCESS_CONTROL_ALLOW_METHODS,
 				"GET, POST, PUT, DELETE, OPTIONS, HEAD");
-		context.getHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS, "*");
+		context.getHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS,
+				"Origin, X-Requested-With, Content-Type, Accept");
 
 		context.proceed();
 	}

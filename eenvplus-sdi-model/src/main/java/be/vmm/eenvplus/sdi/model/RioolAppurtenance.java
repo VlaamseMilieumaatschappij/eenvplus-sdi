@@ -208,7 +208,7 @@ public class RioolAppurtenance implements RioolObject {
 	@AssertQuery("SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId")
 	protected Map<String, Object> getCheckUitlaatParams() {
 
-		if (rioolAppurtenanceTypeId == 6L/* dischargeStructure */) {
+		if (rioolAppurtenanceTypeId != null && rioolAppurtenanceTypeId == 6L/* dischargeStructure */) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("koppelpuntId", koppelpuntId);
 			return params;

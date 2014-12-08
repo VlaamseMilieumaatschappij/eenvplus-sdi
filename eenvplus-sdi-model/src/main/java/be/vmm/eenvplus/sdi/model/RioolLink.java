@@ -29,9 +29,9 @@ import be.vmm.eenvplus.sdi.model.constraint.AssertQuery;
 import be.vmm.eenvplus.sdi.model.constraint.AssertQuery.AssertQueryCondition;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
 import be.vmm.eenvplus.sdi.model.constraint.NodePosition;
-import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
+import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -256,7 +256,7 @@ public class RioolLink implements RioolObject {
 			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
 	protected Map<String, Object> getCheckStartPersleidingParams() {
 
-		if (rioolLinkTypeId == 2L/* persleiding */) {
+		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("koppelpuntId", startKoppelPuntId);
 			return params;
@@ -270,7 +270,7 @@ public class RioolLink implements RioolObject {
 			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
 	protected Map<String, Object> getCheckEndPersleidingParams() {
 
-		if (rioolLinkTypeId == 2L/* persleiding */) {
+		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("koppelpuntId", endKoppelPuntId);
 			return params;

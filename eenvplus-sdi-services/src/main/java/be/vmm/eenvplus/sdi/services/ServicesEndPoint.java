@@ -63,6 +63,9 @@ import com.vividsolutions.jts.geom.Geometry;
 @Path("/services")
 public class ServicesEndPoint {
 
+	public static int MAX_RESULTS_IDENTIFY = 100;
+	public static int MAX_RESULTS_PULL = 1000;
+
 	@PersistenceContext(unitName = "eenvplus")
 	protected EntityManager entityManager;
 	@Inject
@@ -340,6 +343,7 @@ public class ServicesEndPoint {
 					Boolean.TRUE));
 
 			TypedQuery<Object> query = entityManager.createQuery(criteria);
+			query.setMaxResults(MAX_RESULTS_IDENTIFY);
 			results.addAll(query.getResultList());
 		}
 
@@ -376,6 +380,7 @@ public class ServicesEndPoint {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
 		for (String type : types.split(",")) {
+			@SuppressWarnings("unchecked")
 			Class<Object> clazz = (Class<Object>) Class.forName(type);
 
 			CriteriaQuery<Object> criteria = builder.createQuery(clazz);
@@ -393,7 +398,7 @@ public class ServicesEndPoint {
 			}
 
 			TypedQuery<Object> query = entityManager.createQuery(criteria);
-			query.setMaxResults(100);
+			query.setMaxResults(MAX_RESULTS_PULL);
 			results.addAll(query.getResultList());
 		}
 
@@ -626,6 +631,7 @@ public class ServicesEndPoint {
 
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
+		@SuppressWarnings("unchecked")
 		Class<Object> clazz = (Class<Object>) Class.forName(type);
 
 		CriteriaQuery<Object> criteria = builder.createQuery(clazz);
@@ -644,6 +650,7 @@ public class ServicesEndPoint {
 			@PathParam("type") String type, @PathParam("id") Long id)
 			throws ClassNotFoundException {
 
+		@SuppressWarnings("unchecked")
 		Class<Object> clazz = (Class<Object>) Class.forName(type);
 
 		return entityManager.find(clazz, id);

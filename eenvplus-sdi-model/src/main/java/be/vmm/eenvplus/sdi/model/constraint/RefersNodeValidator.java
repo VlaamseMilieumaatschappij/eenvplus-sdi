@@ -11,7 +11,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class RefersNodeValidator implements
 		ConstraintValidator<RefersNode, NodeValue> {
 
-	@PersistenceContext(unitName = "eenvplus", synchronization = SynchronizationType.UNSYNCHRONIZED)
+	@PersistenceContext(unitName = "eenvplus" , synchronization = SynchronizationType.UNSYNCHRONIZED)
 	protected EntityManager entityManager;
 
 	protected NodePosition nodePosition;

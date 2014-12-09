@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 
 public class RefersValidator implements ConstraintValidator<Refers, Object> {
 
-	@PersistenceContext(unitName = "eenvplus", synchronization = SynchronizationType.UNSYNCHRONIZED)
+	@PersistenceContext(unitName = "eenvplus" , synchronization = SynchronizationType.UNSYNCHRONIZED)
 	protected EntityManager entityManager;
 
 	protected Class<?> entityType;

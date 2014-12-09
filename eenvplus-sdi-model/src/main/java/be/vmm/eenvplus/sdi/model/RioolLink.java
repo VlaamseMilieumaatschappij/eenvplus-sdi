@@ -9,9 +9,12 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
@@ -35,6 +38,7 @@ import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
+import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
 
@@ -50,6 +54,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class RioolLink implements RioolObject {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RioolLink_id_seq")
+	@SequenceGenerator(name = "RioolLink_id_seq", sequenceName = "gengis.RioolLink_id_seq", allocationSize = 1)
 	protected Long id;
 
 	@Past
@@ -65,9 +71,9 @@ public class RioolLink implements RioolObject {
 	@Refers(entityType = RioolLinkType.class)
 	protected Long rioolLinkTypeId;
 	@NotNull
-	protected Long startKoppelPuntId;
+	protected Reference<KoppelPunt> startKoppelPuntId;
 	@NotNull
-	protected Long endKoppelPuntId;
+	protected Reference<KoppelPunt> endKoppelPuntId;
 	@NotNull
 	@DecimalMin("250")
 	@DecimalMax("3200")
@@ -152,19 +158,19 @@ public class RioolLink implements RioolObject {
 		this.rioolLinkTypeId = rioolLinkTypeId;
 	}
 
-	public Long getStartKoppelPuntId() {
+	public Reference<KoppelPunt> getStartKoppelPuntId() {
 		return startKoppelPuntId;
 	}
 
-	public void setStartKoppelPuntId(Long startKoppelPuntId) {
+	public void setStartKoppelPuntId(Reference<KoppelPunt> startKoppelPuntId) {
 		this.startKoppelPuntId = startKoppelPuntId;
 	}
 
-	public Long getEndKoppelPuntId() {
+	public Reference<KoppelPunt> getEndKoppelPuntId() {
 		return endKoppelPuntId;
 	}
 
-	public void setEndKoppelPuntId(Long endKoppelPuntId) {
+	public void setEndKoppelPuntId(Reference<KoppelPunt> endKoppelPuntId) {
 		this.endKoppelPuntId = endKoppelPuntId;
 	}
 
@@ -250,22 +256,22 @@ public class RioolLink implements RioolObject {
 
 	@RefersNode(nodePosition = NodePosition.start, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01)
 	protected NodeValue getStartKoppelPuntReference() {
-		return new NodeValue(startKoppelPuntId, geom);
+		return new NodeValue(startKoppelPuntId.getValue(), geom);
 	}
 
 	@RefersNode(nodePosition = NodePosition.end, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01)
 	protected NodeValue getEndKoppelPuntReference() {
-		return new NodeValue(startKoppelPuntId, geom);
+		return new NodeValue(startKoppelPuntId.getValue(), geom);
 	}
 
 	@AssertQuery(value = {
-			"SELECT count(l) = 0 FROM RioolLink l WHERE rioolLinkTypeId = 2 AND (l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId)",
-			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
+			"SELECT count(l) > 0 FROM RioolLink l WHERE rioolLinkTypeId = 2 AND (l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId)",
+			"SELECT count(a) > 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
 	protected Map<String, Object> getCheckStartPersleidingParams() {
 
 		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("koppelpuntId", startKoppelPuntId);
+			params.put("koppelpuntId", startKoppelPuntId.getValue());
 			return params;
 		}
 

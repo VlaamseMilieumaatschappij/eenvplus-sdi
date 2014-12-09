@@ -13,7 +13,7 @@ import javax.validation.ConstraintValidatorContext;
 
 public class StaticValidator implements ConstraintValidator<Static, Object> {
 
-	@PersistenceContext(unitName = "eenvplus", synchronization = SynchronizationType.UNSYNCHRONIZED)
+	@PersistenceContext(unitName = "eenvplus" , synchronization = SynchronizationType.UNSYNCHRONIZED)
 	protected EntityManager entityManager;
 
 	protected String[] propertyNames;

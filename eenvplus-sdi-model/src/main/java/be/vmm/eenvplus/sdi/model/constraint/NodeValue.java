@@ -5,15 +5,15 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class NodeValue {
 
-	protected Object reference;
+	protected Long reference;
 	protected Geometry geometry;
 
-	public NodeValue(Object reference, Geometry geometry) {
+	public NodeValue(Long reference, Geometry geometry) {
 		this.reference = reference;
 		this.geometry = geometry;
 	}
 
-	public Object getReference() {
+	public Long getReference() {
 		return reference;
 	}
 

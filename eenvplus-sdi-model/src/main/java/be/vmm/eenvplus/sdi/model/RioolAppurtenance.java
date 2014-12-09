@@ -9,9 +9,12 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -23,14 +26,14 @@ import org.hibernate.annotations.Where;
 
 import be.vmm.eenvplus.sdi.model.code.Namespace;
 import be.vmm.eenvplus.sdi.model.code.RioolAppurtenanceType;
-import be.vmm.eenvplus.sdi.model.constraint.AssertQuery;
 import be.vmm.eenvplus.sdi.model.constraint.GeometrySimple;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
-import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
+import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.Static;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
+import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
 
@@ -47,6 +50,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class RioolAppurtenance implements RioolObject {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RioolAppurtenance_id_seq")
+	@SequenceGenerator(name = "RioolAppurtenance_id_seq", sequenceName = "gengis.RioolAppurtenance_id_seq", allocationSize = 1)
 	protected Long id;
 
 	@Past
@@ -62,7 +67,7 @@ public class RioolAppurtenance implements RioolObject {
 	@Refers(entityType = RioolAppurtenanceType.class)
 	protected Long rioolAppurtenanceTypeId;
 	@NotNull
-	protected Long koppelpuntId;
+	protected Reference<KoppelPunt> koppelpuntId;
 	protected String label;
 	protected String omschrijving;
 
@@ -136,11 +141,11 @@ public class RioolAppurtenance implements RioolObject {
 		this.rioolAppurtenanceTypeId = rioolAppurtenanceTypeId;
 	}
 
-	public Long getKoppelpuntId() {
+	public Reference<KoppelPunt> getKoppelpuntId() {
 		return koppelpuntId;
 	}
 
-	public void setKoppelpuntId(Long koppelpuntId) {
+	public void setKoppelpuntId(Reference<KoppelPunt> koppelpuntId) {
 		this.koppelpuntId = koppelpuntId;
 	}
 
@@ -160,16 +165,16 @@ public class RioolAppurtenance implements RioolObject {
 		this.omschrijving = omschrijving;
 	}
 
-	public List<RioolAppurtenanceStatus> getStatussen() {
-		return statussen;
-	}
-
 	public Long getVhaSegmentId() {
 		return vhaSegmentId;
 	}
 
 	public void setVhaSegmentId(Long vhaSegmentId) {
 		this.vhaSegmentId = vhaSegmentId;
+	}
+
+	public List<RioolAppurtenanceStatus> getStatussen() {
+		return statussen;
 	}
 
 	public void setStatussen(List<RioolAppurtenanceStatus> statussen) {
@@ -202,15 +207,15 @@ public class RioolAppurtenance implements RioolObject {
 
 	@RefersNode(nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 5)
 	protected NodeValue getKoppelPuntReference() {
-		return new NodeValue(koppelpuntId, geom);
+		return new NodeValue(koppelpuntId.getValue(), geom);
 	}
 
-	@AssertQuery("SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId")
+	// @AssertQuery("SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelpuntId")
 	protected Map<String, Object> getCheckUitlaatParams() {
 
 		if (rioolAppurtenanceTypeId != null && rioolAppurtenanceTypeId == 6L/* dischargeStructure */) {
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("koppelpuntId", koppelpuntId);
+			params.put("koppelpuntId", koppelpuntId.getValue());
 			return params;
 		}
 

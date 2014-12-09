@@ -107,6 +107,10 @@ public class Feature<T> {
 		return object;
 	}
 
+	public void wrap(T object) {
+		this.object = object;
+	}
+
 	@SuppressWarnings("unchecked")
 	protected Class<T> getObjectClass() {
 		return (Class<T>) object.getClass();

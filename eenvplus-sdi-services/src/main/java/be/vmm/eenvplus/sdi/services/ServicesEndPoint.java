@@ -433,23 +433,26 @@ public class ServicesEndPoint {
 				object.setCreationDate(date);
 				object.setBeginLifeSpanVersion(date);
 				entityManager.persist(object);
-				results.add(new ModificationResult(key,
-						ModificationAction.create, new Feature<Object>(object)));
+				results.add(new ModificationResult(feature.getLayerBodId(),
+						key, ModificationAction.create, new Feature<Object>(
+								object)));
 				break;
 			case update:
 				object.setBeginLifeSpanVersion(date);
 				entityManager.merge(object);
-				results.add(new ModificationResult(key,
-						ModificationAction.update, new Feature<Object>(object)));
+				results.add(new ModificationResult(feature.getLayerBodId(),
+						key, ModificationAction.update, new Feature<Object>(
+								object)));
 				break;
 			case delete:
 				// Does a soft delete by setting endLifeSpanVersion
 				entityManager.remove(object);
-				results.add(new ModificationResult(key,
-						ModificationAction.delete));
+				results.add(new ModificationResult(feature.getLayerBodId(),
+						key, ModificationAction.delete));
 				break;
 			default:
-				results.add(new ModificationResult(key, ModificationAction.none));
+				results.add(new ModificationResult(feature.getLayerBodId(),
+						key, ModificationAction.none));
 			}
 		}
 
@@ -482,10 +485,11 @@ public class ServicesEndPoint {
 				}
 
 				valid = false;
-				results.add(new ValidationResult(feature.getKey(), false,
-						messages));
+				results.add(new ValidationResult(feature.getLayerBodId(),
+						feature.getKey(), false, messages));
 			} else {
-				results.add(new ValidationResult(feature.getKey(), true));
+				results.add(new ValidationResult(feature.getLayerBodId(),
+						feature.getKey(), true));
 			}
 		}
 

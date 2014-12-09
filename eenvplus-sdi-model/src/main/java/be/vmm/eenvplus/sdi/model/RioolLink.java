@@ -14,7 +14,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
@@ -67,8 +69,13 @@ public class RioolLink implements RioolObject {
 	@NotNull
 	protected Long endKoppelPuntId;
 	@NotNull
-	@Min(0)
+	@DecimalMin("250")
+	@DecimalMax("3200")
+	@Digits(integer = 4, fraction = 0)
 	protected Double diameter;
+	@DecimalMin("0.1")
+	@DecimalMax("15.0")
+	@Digits(integer = 2, fraction = 2)
 	protected Double pressure;
 	protected String label;
 	protected String omschrijving;

@@ -96,7 +96,7 @@
     "hasLegend": false,
     "highlightable": true,
     "format": "png",
-    "label": "Mountpoint",
+    "label": "Node",
     "maxResolution": 16,
     "queryable": true,
     "searchable": false,

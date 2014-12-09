@@ -2,23 +2,39 @@ package be.vmm.eenvplus.sdi.api;
 
 import be.vmm.eenvplus.sdi.api.json.Feature;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class ModificationResult {
 
+	protected String layerBodId;
 	protected Long key;
 	protected ModificationAction action;
 
 	protected Feature<Object> feature;
 
-	public ModificationResult(Long key, ModificationAction action,
-			Feature<Object> feature) {
+	public ModificationResult(String layerBodId, Long key,
+			ModificationAction action, Feature<Object> feature) {
+		this.layerBodId = layerBodId;
 		this.key = key;
 		this.action = action;
 		this.feature = feature;
 	}
 
-	public ModificationResult(Long key, ModificationAction action) {
+	public ModificationResult(String layerBodId, Long key,
+			ModificationAction action) {
+		this.layerBodId = layerBodId;
 		this.key = key;
 		this.action = action;
+	}
+
+	public String getLayerBodId() {
+		return layerBodId;
+	}
+
+	public void setLayerBodId(String layerBodId) {
+		this.layerBodId = layerBodId;
 	}
 
 	public Long getKey() {

@@ -22,7 +22,7 @@
         {
           "category": "layer",
           "staging": "prod",
-          "label": "Mountpoint",
+          "label": "Node",
           "layerBodId": "be.vmm.eenvplus.sdi.model.KoppelPunt",
           "id": 1386
         },

@@ -1,9 +1,9 @@
 package be.vmm.eenvplus.sdi.model.type;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.io.Serializable;
 
 @JsonSerialize(using = ReferenceSerializer.class)
 @JsonDeserialize(using = ReferenceDeserializer.class)
@@ -69,7 +69,7 @@ public class Reference<T> implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return type.hashCode() ^ Long.hashCode(value);
+		return type.hashCode() ^ new Long(value).hashCode();
 	}
 
 	@Override

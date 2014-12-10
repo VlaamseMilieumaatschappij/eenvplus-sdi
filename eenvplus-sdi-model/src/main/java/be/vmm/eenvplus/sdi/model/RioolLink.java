@@ -38,6 +38,8 @@ import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
+import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
+import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
 import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -50,7 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
 @SQLDelete(sql = "UPDATE gengis.RioolLink SET endLifeSpanVersion = now() WHERE id = ?")
-@Unique({ "namespaceId", "alternatieveId" })
+@Unique(value = { "namespaceId", "alternatieveId" }, groups = PostPersist.class)
 public class RioolLink implements RioolObject {
 
 	@Id
@@ -68,7 +70,7 @@ public class RioolLink implements RioolObject {
 	protected String alternatieveId;
 
 	@NotNull
-	@Refers(entityType = RioolLinkType.class)
+	@Refers(entityType = RioolLinkType.class, groups = PrePersist.class)
 	protected Long rioolLinkTypeId;
 	@NotNull
 	protected Reference<KoppelPunt> startKoppelPuntId;
@@ -86,7 +88,7 @@ public class RioolLink implements RioolObject {
 	protected String label;
 	protected String omschrijving;
 	@NotNull
-	@Refers(entityType = SewerWaterType.class)
+	@Refers(entityType = SewerWaterType.class, groups = PrePersist.class)
 	protected Long sewerWaterTypeId;
 
 	protected Long straatId;
@@ -97,7 +99,7 @@ public class RioolLink implements RioolObject {
 	@JoinColumn(name = "rioollinkid")
 	protected List<RioolLinkStatus> statussen;
 
-	@Refers(entityType = Namespace.class)
+	@Refers(entityType = Namespace.class, groups = PrePersist.class)
 	protected Long namespaceId;
 
 	@NotNull
@@ -254,19 +256,19 @@ public class RioolLink implements RioolObject {
 		this.userId = userId;
 	}
 
-	@RefersNode(nodePosition = NodePosition.start, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01)
+	@RefersNode(nodePosition = NodePosition.start, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01, groups = PostPersist.class)
 	protected NodeValue getStartKoppelPuntReference() {
 		return new NodeValue(startKoppelPuntId.getValue(), geom);
 	}
 
-	@RefersNode(nodePosition = NodePosition.end, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01)
+	@RefersNode(nodePosition = NodePosition.end, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01, groups = PostPersist.class)
 	protected NodeValue getEndKoppelPuntReference() {
 		return new NodeValue(startKoppelPuntId.getValue(), geom);
 	}
 
 	@AssertQuery(value = {
 			"SELECT count(l) > 0 FROM RioolLink l WHERE rioolLinkTypeId = 2 AND (l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId)",
-			"SELECT count(a) > 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
+			"SELECT count(a) > 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any, groups = PostPersist.class)
 	protected Map<String, Object> getCheckStartPersleidingParams() {
 
 		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {
@@ -280,7 +282,7 @@ public class RioolLink implements RioolObject {
 
 	@AssertQuery(value = {
 			"SELECT count(l) = 0 FROM RioolLink l WHERE rioolLinkTypeId = 2 AND (l.startKoppelPuntId = :koppelpuntId OR l.endKoppelPuntId = :koppelpuntId)",
-			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any)
+			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any, groups = PostPersist.class)
 	protected Map<String, Object> getCheckEndPersleidingParams() {
 
 		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {

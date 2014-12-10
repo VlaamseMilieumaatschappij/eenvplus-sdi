@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 import be.vmm.eenvplus.sdi.model.code.Status;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
+import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
 
 @Entity
 @Table(name = "rioollink_status", schema = "gengis")
@@ -23,7 +24,7 @@ public class RioolLinkStatus {
 	protected Long id;
 
 	@NotNull
-	@Refers(entityType = Status.class)
+	@Refers(entityType = Status.class, groups = PrePersist.class)
 	protected Long statusId;
 
 	protected Date geldigVanaf;

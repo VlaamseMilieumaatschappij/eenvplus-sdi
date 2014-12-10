@@ -11,17 +11,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.Stateless;
+import javax.annotation.Resource;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateful;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.FlushModeType;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.groups.Default;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -54,18 +64,25 @@ import be.vmm.eenvplus.sdi.api.json.GeometryParam;
 import be.vmm.eenvplus.sdi.api.json.ViewPortParam;
 import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
 import be.vmm.eenvplus.sdi.model.RioolObject;
+import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
+import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
+import be.vmm.eenvplus.sdi.model.type.Reference;
+import be.vmm.eenvplus.sdi.model.type.Reference.ReferenceType;
+import be.vmm.eenvplus.sdi.model.type.ReferenceInfo;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-@Stateless
+@Stateful
 @Path("/services")
 public class ServicesEndPoint {
 
 	public static int MAX_RESULTS_IDENTIFY = 100;
 	public static int MAX_RESULTS_PULL = 1000;
 
+	@Resource
+	protected SessionContext sessionContext;
 	@PersistenceContext(unitName = "eenvplus")
 	protected EntityManager entityManager;
 	@Inject
@@ -409,22 +426,30 @@ public class ServicesEndPoint {
 	@Path("/{mapId}/MapServer/push")
 	@Consumes("application/json")
 	@Produces("application/json")
+	@Transactional
 	public ModificationReport push(@PathParam("mapId") String mapId,
-			List<ModifiedFeature<RioolObject>> features) {
+			List<ModifiedFeature<RioolObject>> features)
+			throws IllegalStateException, SystemException,
+			NotSupportedException, SecurityException, RollbackException,
+			HeuristicMixedException, HeuristicRollbackException {
 
-		ValidationReport validation = test(mapId, features);
-		if (!validation.isValid()) {
-			return new ModificationReport(false, validation);
-		}
+		entityManager.setFlushMode(FlushModeType.COMMIT);
+
+		ValidationReport validationReport = validate(features, Default.class,
+				PrePersist.class);
+		if (!validationReport.isValid())
+			return new ModificationReport(false, validationReport);
 
 		Date date = new Date();
 
 		boolean completed = true;
+		Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass = new HashMap<Class<?>, Map<Reference<?>, Reference<?>>>();
 		List<ModificationResult> results = new ArrayList<ModificationResult>(
 				features.size());
 
 		for (ModifiedFeature<RioolObject> feature : features) {
 			RioolObject object = feature.unwrap();
+			String layerBodId = feature.getLayerBodId();
 			Long key = feature.getKey();
 			ModificationAction action = feature.getAction();
 
@@ -433,38 +458,130 @@ public class ServicesEndPoint {
 				object.setCreationDate(date);
 				object.setBeginLifeSpanVersion(date);
 				entityManager.persist(object);
-				results.add(new ModificationResult(feature.getLayerBodId(),
-						key, ModificationAction.create, new Feature<Object>(
-								object)));
+				results.add(new ModificationResult(layerBodId, key,
+						ModificationAction.create, new Feature<Object>(object)));
+				ReferenceInfo.addReplacement(replacementsByClass, object
+						.getClass(), new Reference<RioolObject>(
+						ReferenceType.key, key), new Reference<RioolObject>(
+						object.getId()));
+
 				break;
 			case update:
 				object.setBeginLifeSpanVersion(date);
-				entityManager.merge(object);
-				results.add(new ModificationResult(feature.getLayerBodId(),
-						key, ModificationAction.update, new Feature<Object>(
-								object)));
+				object = entityManager.merge(object);
+				feature.wrap(object);
+				results.add(new ModificationResult(layerBodId, key,
+						ModificationAction.update, new Feature<Object>(object)));
+
 				break;
 			case delete:
 				// Does a soft delete by setting endLifeSpanVersion
 				entityManager.remove(object);
-				results.add(new ModificationResult(feature.getLayerBodId(),
-						key, ModificationAction.delete));
+				results.add(new ModificationResult(layerBodId, key,
+						ModificationAction.delete));
 				break;
 			default:
-				results.add(new ModificationResult(feature.getLayerBodId(),
-						key, ModificationAction.none));
+				results.add(new ModificationResult(layerBodId, key,
+						ModificationAction.none));
 			}
 		}
 
-		return new ModificationReport(completed, validation, results);
+		for (ModifiedFeature<RioolObject> feature : features) {
+			if (feature.getAction() != ModificationAction.delete) {
+				RioolObject object = feature.unwrap();
+				ReferenceInfo.replaceReferences(object, replacementsByClass);
+				object = entityManager.merge(object);
+				feature.wrap(object);
+			}
+		}
+
+		entityManager.flush();
+
+		validationReport = validate(features);
+
+		completed = validationReport.isValid();
+
+		if (!completed)
+			sessionContext.setRollbackOnly();
+
+		return new ModificationReport(completed, validationReport, results);
 	}
 
 	@POST
 	@Path("/{mapId}/MapServer/test")
 	@Consumes("application/json")
 	@Produces("application/json")
+	@Transactional
 	public ValidationReport test(@PathParam("mapId") String mapId,
-			List<ModifiedFeature<RioolObject>> features) {
+			List<ModifiedFeature<RioolObject>> features)
+			throws IllegalStateException, SystemException,
+			NotSupportedException {
+
+		entityManager.setFlushMode(FlushModeType.COMMIT);
+
+		ValidationReport validationReport = validate(features, Default.class,
+				PrePersist.class);
+		if (!validationReport.isValid())
+			return validationReport;
+
+		try {
+
+			Date date = new Date();
+
+			Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass = new HashMap<Class<?>, Map<Reference<?>, Reference<?>>>();
+
+			for (ModifiedFeature<RioolObject> feature : features) {
+				RioolObject object = feature.unwrap();
+				ModificationAction action = feature.getAction();
+
+				switch (action) {
+				case create:
+					object.setCreationDate(date);
+					object.setBeginLifeSpanVersion(date);
+					entityManager.persist(object);
+					ReferenceInfo.addReplacement(replacementsByClass, object
+							.getClass(), new Reference<RioolObject>(
+							ReferenceType.key, feature.getKey()),
+							new Reference<RioolObject>(object.getId()));
+
+					break;
+				case update:
+					object.setBeginLifeSpanVersion(date);
+					object = entityManager.merge(object);
+					feature.wrap(object);
+
+					break;
+				case delete:
+					// Does a soft delete by setting endLifeSpanVersion
+					entityManager.remove(object);
+					break;
+				default:
+				}
+			}
+
+			for (ModifiedFeature<RioolObject> feature : features) {
+				if (feature.getAction() != ModificationAction.delete) {
+					RioolObject object = feature.unwrap();
+					ReferenceInfo
+							.replaceReferences(object, replacementsByClass);
+					object = entityManager.merge(object);
+					feature.wrap(object);
+				}
+			}
+
+			entityManager.flush();
+
+			validationReport = validate(features, PostPersist.class);
+
+			return validationReport;
+		} finally {
+			sessionContext.setRollbackOnly();
+		}
+	}
+
+	protected ValidationReport validate(
+			List<ModifiedFeature<RioolObject>> features, Class<?>... groups)
+			throws IllegalStateException, SystemException {
 
 		boolean valid = true;
 		List<ValidationResult> results = new ArrayList<ValidationResult>(
@@ -473,25 +590,34 @@ public class ServicesEndPoint {
 		Validator validator = validatorFactory.getValidator();
 
 		for (ModifiedFeature<RioolObject> feature : features) {
-			Set<ConstraintViolation<RioolObject>> violations = validator
-					.validate(feature.unwrap());
-			if (violations.size() > 0) {
-				List<ValidationMessage> messages = new ArrayList<ValidationMessage>();
-				for (ConstraintViolation<RioolObject> violation : validator
-						.validate(feature.unwrap())) {
-					messages.add(new ValidationMessage(ValidationLevel.error,
-							violation.getPropertyPath().toString(), violation
-									.getMessage()));
-				}
+			RioolObject object = feature.unwrap();
+			String layerBodId = feature.getLayerBodId();
+			Long key = feature.getKey();
 
-				valid = false;
-				results.add(new ValidationResult(feature.getLayerBodId(),
-						feature.getKey(), false, messages));
-			} else {
-				results.add(new ValidationResult(feature.getLayerBodId(),
-						feature.getKey(), true));
+			if (feature.getAction() != ModificationAction.delete) {
+				Set<ConstraintViolation<RioolObject>> violations = validator
+						.validate(feature.unwrap(), groups);
+				if (violations.size() > 0) {
+					List<ValidationMessage> messages = new ArrayList<ValidationMessage>();
+					for (ConstraintViolation<RioolObject> violation : violations) {
+						messages.add(new ValidationMessage(
+								ValidationLevel.error, violation
+										.getPropertyPath().toString(),
+								violation.getMessage()));
+					}
+
+					valid = false;
+					results.add(new ValidationResult(layerBodId, key, false,
+							messages));
+				} else {
+					results.add(new ValidationResult(layerBodId, key, true));
+
+				}
 			}
 		}
+
+		if (!valid)
+			sessionContext.setRollbackOnly();
 
 		return new ValidationReport(valid, results);
 	}

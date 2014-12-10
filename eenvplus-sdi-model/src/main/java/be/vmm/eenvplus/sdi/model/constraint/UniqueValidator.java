@@ -54,19 +54,14 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
 			List<Predicate> predicates = new ArrayList<Predicate>(
 					propertyNames.length + 1);
 
-			boolean notNull = false;
-
 			for (String propertyName : propertyNames) {
 				Object propertyValue = getPropertyValue(model, propertyName,
 						value);
-				if (propertyValue != null)
-					notNull = true;
+				if (propertyValue == null)
+					return true;
 				predicates.add(builder.equal(root.get(propertyName),
 						propertyValue));
 			}
-
-			if (!notNull)
-				return true;
 
 			if (id != null) {
 				predicates.add(builder.notEqual(

@@ -33,6 +33,8 @@ import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.Static;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
+import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
+import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
 import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -45,8 +47,8 @@ import com.vividsolutions.jts.geom.Geometry;
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
 @SQLDelete(sql = "UPDATE gengis.RioolAppurtenance SET endLifeSpanVersion = now() WHERE id = ?")
-@Unique({ "namespaceId", "alternatieveId" })
-@Static("rioolAppurtenanceTypeId")
+@Unique(value = { "namespaceId", "alternatieveId" }, groups = PostPersist.class)
+@Static(value = "rioolAppurtenanceTypeId", groups = PrePersist.class)
 public class RioolAppurtenance implements RioolObject {
 
 	@Id
@@ -64,7 +66,7 @@ public class RioolAppurtenance implements RioolObject {
 	protected String alternatieveId;
 
 	@NotNull
-	@Refers(entityType = RioolAppurtenanceType.class)
+	@Refers(entityType = RioolAppurtenanceType.class, groups = PrePersist.class)
 	protected Long rioolAppurtenanceTypeId;
 	@NotNull
 	protected Reference<KoppelPunt> koppelpuntId;
@@ -79,7 +81,7 @@ public class RioolAppurtenance implements RioolObject {
 	@JoinColumn(name = "rioolappurtenanceid")
 	protected List<RioolAppurtenanceStatus> statussen;
 
-	@Refers(entityType = Namespace.class)
+	@Refers(entityType = Namespace.class, groups = PrePersist.class)
 	protected Long namespaceId;
 
 	@NotNull
@@ -205,12 +207,13 @@ public class RioolAppurtenance implements RioolObject {
 		this.userId = userId;
 	}
 
-	@RefersNode(nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 5)
+	@RefersNode(nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 5, groups = PostPersist.class)
 	protected NodeValue getKoppelPuntReference() {
 		return new NodeValue(koppelpuntId.getValue(), geom);
 	}
 
-	// @AssertQuery("SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelpuntId")
+	// @AssertQuery("SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelpuntId",
+	// groups = PostPersist.class)
 	protected Map<String, Object> getCheckUitlaatParams() {
 
 		if (rioolAppurtenanceTypeId != null && rioolAppurtenanceTypeId == 6L/* dischargeStructure */) {

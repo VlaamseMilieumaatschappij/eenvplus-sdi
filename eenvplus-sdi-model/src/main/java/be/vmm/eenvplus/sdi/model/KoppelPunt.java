@@ -20,6 +20,8 @@ import be.vmm.eenvplus.sdi.model.code.Namespace;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
+import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
+import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
 
@@ -31,7 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Table(schema = "gengis")
 @Where(clause = "endLifeSpanVersion IS NULL")
 @SQLDelete(sql = "UPDATE gengis.KoppelPunt SET endLifeSpanVersion = now() WHERE id = ?")
-@Unique({ "namespaceId", "alternatieveId" })
+@Unique(value = { "namespaceId", "alternatieveId" }, groups = PostPersist.class)
 public class KoppelPunt implements RioolObject {
 
 	@Id
@@ -48,7 +50,7 @@ public class KoppelPunt implements RioolObject {
 
 	protected String alternatieveId;
 
-	@Refers(entityType = Namespace.class)
+	@Refers(entityType = Namespace.class, groups = PrePersist.class)
 	protected Long namespaceId;
 
 	@NotNull

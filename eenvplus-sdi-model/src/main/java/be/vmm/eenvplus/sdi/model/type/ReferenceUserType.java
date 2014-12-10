@@ -10,6 +10,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 
+import be.vmm.eenvplus.sdi.model.type.Reference.ReferenceType;
+
 /**
  * User type to store references.
  */
@@ -45,11 +47,12 @@ public class ReferenceUserType implements UserType, Serializable {
 	public void nullSafeSet(PreparedStatement st, Object value, int index,
 			SessionImplementor session) throws HibernateException, SQLException {
 		if (value instanceof Reference) {
-			st.setLong(index, ((Reference<Object>) value).getValue());
+			if (((Reference<Object>) value).getType() == ReferenceType.id)
+				st.setLong(index, ((Reference<Object>) value).getValue());
+			else
+				st.setLong(index, 0L);
 		} else if (value instanceof Number) {
 			st.setLong(index, ((Number) value).longValue());
-		} else if (value instanceof String) {
-			st.setLong(index, Long.parseLong((String) value));
 		}
 	}
 

@@ -391,6 +391,15 @@ public class ServicesEndPoint {
 			@QueryParam("types") String types,
 			@QueryParam("extent") ExtentParam extent)
 			throws ClassNotFoundException {
+		
+
+		// Fix SRIDs
+		for (ModifiedFeature<RioolObject> feature : features) {
+			try {
+				feature.getGeometry().setSRID(31370);
+			} catch (Exception e) {
+			}
+		}
 
 		List<Object> results = new ArrayList<Object>();
 
@@ -516,6 +525,14 @@ public class ServicesEndPoint {
 			List<ModifiedFeature<RioolObject>> features)
 			throws IllegalStateException, SystemException,
 			NotSupportedException {
+
+		// Fix SRIDs
+		for (ModifiedFeature<RioolObject> feature : features) {
+			try {
+				feature.getGeometry().setSRID(31370);
+			} catch (Exception e) {
+			}
+		}
 
 		entityManager.setFlushMode(FlushModeType.COMMIT);
 

@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
@@ -41,15 +40,13 @@ public class KoppelPunt implements RioolObject {
 	@SequenceGenerator(name = "KoppelPunt_id_seq", sequenceName = "gengis.KoppelPunt_id_seq", allocationSize = 1)
 	protected Long id;
 
-	@Past
 	protected Date creationDate;
-	@Past
 	protected Date beginLifeSpanVersion;
-	@Past
 	protected Date endLifeSpanVersion;
 
 	protected String alternatieveId;
 
+	@NotNull
 	@Refers(entityType = Namespace.class, groups = PrePersist.class)
 	protected Long namespaceId;
 

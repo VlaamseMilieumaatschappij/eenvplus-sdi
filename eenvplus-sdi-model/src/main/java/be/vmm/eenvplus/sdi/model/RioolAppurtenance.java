@@ -56,11 +56,8 @@ public class RioolAppurtenance implements RioolObject {
 	@SequenceGenerator(name = "RioolAppurtenance_id_seq", sequenceName = "gengis.RioolAppurtenance_id_seq", allocationSize = 1)
 	protected Long id;
 
-	@Past
 	protected Date creationDate;
-	@Past
 	protected Date beginLifeSpanVersion;
-	@Past
 	protected Date endLifeSpanVersion;
 
 	protected String alternatieveId;
@@ -81,6 +78,7 @@ public class RioolAppurtenance implements RioolObject {
 	@JoinColumn(name = "rioolappurtenanceid")
 	protected List<RioolAppurtenanceStatus> statussen;
 
+	@NotNull
 	@Refers(entityType = Namespace.class, groups = PrePersist.class)
 	protected Long namespaceId;
 

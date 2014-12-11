@@ -21,7 +21,6 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
@@ -60,11 +59,8 @@ public class RioolLink implements RioolObject {
 	@SequenceGenerator(name = "RioolLink_id_seq", sequenceName = "gengis.RioolLink_id_seq", allocationSize = 1)
 	protected Long id;
 
-	@Past
 	protected Date creationDate;
-	@Past
 	protected Date beginLifeSpanVersion;
-	@Past
 	protected Date endLifeSpanVersion;
 
 	protected String alternatieveId;
@@ -99,6 +95,7 @@ public class RioolLink implements RioolObject {
 	@JoinColumn(name = "rioollinkid")
 	protected List<RioolLinkStatus> statussen;
 
+	@NotNull
 	@Refers(entityType = Namespace.class, groups = PrePersist.class)
 	protected Long namespaceId;
 
@@ -263,7 +260,7 @@ public class RioolLink implements RioolObject {
 
 	@RefersNode(nodePosition = NodePosition.end, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01, groups = PostPersist.class)
 	protected NodeValue getEndKoppelPuntReference() {
-		return new NodeValue(startKoppelPuntId.getValue(), geom);
+		return new NodeValue(endKoppelPuntId.getValue(), geom);
 	}
 
 	@AssertQuery(value = {
@@ -287,7 +284,7 @@ public class RioolLink implements RioolObject {
 
 		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("koppelpuntId", endKoppelPuntId);
+			params.put("koppelpuntId", endKoppelPuntId.getValue());
 			return params;
 		}
 

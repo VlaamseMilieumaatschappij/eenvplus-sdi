@@ -68,54 +68,6 @@ public class ReferenceInfo {
 		return Object.class;
 	}
 
-	public static void replaceReferences(Object object,
-			Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass) {
-
-		ReferenceInfo info = getReferenceInfo(object.getClass());
-
-		for (Map.Entry<Class<?>, Map<Reference<?>, Reference<?>>> entry : replacementsByClass
-				.entrySet()) {
-			List<PropertyDescriptor> descriptors = info
-					.getReferenceDescriptors(entry.getKey());
-			Map<Reference<?>, Reference<?>> replacements = entry.getValue();
-			if (replacements != null) {
-				for (PropertyDescriptor descriptor : descriptors) {
-					try {
-						Object value = descriptor.getReadMethod()
-								.invoke(object);
-						Object replacement = replacements.get(value);
-						if (replacement != null)
-							descriptor.getWriteMethod().invoke(object,
-									replacement);
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}
-			}
-		}
-	}
-
-	public static void replaceReferences(List<Object> objects,
-			Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass) {
-
-		for (Object object : objects) {
-			replaceReferences(object, replacementsByClass);
-		}
-	}
-
-	public static void addReplacement(
-			Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass,
-			Class<?> referenceType, Reference<?> old, Reference<?> replacement) {
-
-		Map<Reference<?>, Reference<?>> replacements = replacementsByClass
-				.get(referenceType);
-		if (replacements == null) {
-			replacements = new HashMap<Reference<?>, Reference<?>>();
-			replacementsByClass.put(referenceType, replacements);
-		}
-		replacements.put(old, replacement);
-	}
-
 	protected Map<Class<?>, List<PropertyDescriptor>> referenceDescriptorMap;
 
 	public ReferenceInfo(

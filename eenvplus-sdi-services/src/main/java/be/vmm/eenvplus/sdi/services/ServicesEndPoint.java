@@ -60,12 +60,17 @@ import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
 import be.vmm.eenvplus.sdi.model.Riool;
 import be.vmm.eenvplus.sdi.model.RioolObject;
 import be.vmm.eenvplus.sdi.model.code.Code;
+import be.vmm.eenvplus.sdi.model.code.Namespace;
+import be.vmm.eenvplus.sdi.model.code.RioolAppurtenanceType;
+import be.vmm.eenvplus.sdi.model.code.RioolLinkType;
+import be.vmm.eenvplus.sdi.model.code.SewerWaterType;
+import be.vmm.eenvplus.sdi.model.code.Status;
 import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
 import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
 import be.vmm.eenvplus.sdi.model.store.RioolStore;
 import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.model.type.Reference.ReferenceType;
-import be.vmm.eenvplus.sdi.model.type.ReferenceInfo;
+import be.vmm.eenvplus.sdi.model.type.ReferenceReplacer;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
 import be.vmm.eenvplus.sdi.services.gml.GML2Model;
 
@@ -79,6 +84,11 @@ public class ServicesEndPoint {
 	public static int MAX_RESULTS_SEARCH = 10;
 	public static int MAX_RESULTS_IDENTIFY = 100;
 	public static int MAX_RESULTS_PULL = 1000;
+
+	@SuppressWarnings("unchecked")
+	public static Class<Code>[] CODE_TYPES = new Class[] { Namespace.class,
+			RioolAppurtenanceType.class, RioolLinkType.class,
+			SewerWaterType.class, Status.class };
 
 	@Resource
 	protected SessionContext sessionContext;
@@ -409,14 +419,14 @@ public class ServicesEndPoint {
 			return new ModificationReport(false, validationReport);
 
 		boolean completed = true;
-		Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass = new HashMap<Class<?>, Map<Reference<?>, Reference<?>>>();
+		ReferenceReplacer replacer = new ReferenceReplacer();
 		List<ModificationResult> results = new ArrayList<ModificationResult>(
 				features.size());
 
 		for (ModifiedFeature<RioolObject> feature : features) {
 			RioolObject object = feature.unwrap();
 			String layerBodId = feature.getLayerBodId();
-			Long key = feature.getKey();
+			Object key = feature.getKey();
 			ModificationAction action = feature.getAction();
 
 			switch (action) {
@@ -424,8 +434,7 @@ public class ServicesEndPoint {
 				rioolStore.persist(object);
 				results.add(new ModificationResult(layerBodId, key,
 						ModificationAction.create, new Feature<Object>(object)));
-				ReferenceInfo.addReplacement(replacementsByClass, object
-						.getClass(), new Reference<RioolObject>(
+				replacer.put(object.getClass(), new Reference<RioolObject>(
 						ReferenceType.key, key.toString()),
 						new Reference<RioolObject>(object.getId()));
 
@@ -448,14 +457,7 @@ public class ServicesEndPoint {
 			}
 		}
 
-		for (ModifiedFeature<RioolObject> feature : features) {
-			if (feature.getAction() != ModificationAction.delete) {
-				RioolObject object = feature.unwrap();
-				ReferenceInfo.replaceReferences(object, replacementsByClass);
-				object = rioolStore.merge(object);
-				feature.wrap(object);
-			}
-		}
+		replaceReferences(features, replacer);
 
 		rioolStore.flush();
 
@@ -467,6 +469,42 @@ public class ServicesEndPoint {
 			sessionContext.setRollbackOnly();
 
 		return new ModificationReport(completed, validationReport, results);
+	}
+
+	protected ReferenceReplacer getCodeReferenceReplacer() {
+
+		ReferenceReplacer replacer = new ReferenceReplacer();
+
+		for (Class<Code> type : CODE_TYPES) {
+			for (Code code : rioolStore.getCodes(type)) {
+				replacer.put(
+						type,
+						new Reference<Code>(ReferenceType.key, code.getLabel()),
+						new Reference<Code>(code.getId()));
+			}
+		}
+
+		return replacer;
+	}
+
+	protected void replaceReferences(
+			List<ModifiedFeature<RioolObject>> features,
+			ReferenceReplacer replacer) {
+
+		for (ModifiedFeature<RioolObject> feature : features) {
+			if (feature.getAction() != ModificationAction.delete) {
+				replaceReferences(feature, replacer);
+			}
+		}
+	}
+
+	protected void replaceReferences(ModifiedFeature<RioolObject> feature,
+			ReferenceReplacer replacer) {
+
+		RioolObject object = feature.unwrap();
+		replacer.replace(object);
+		object = rioolStore.merge(object);
+		feature.wrap(object);
 	}
 
 	@POST
@@ -485,18 +523,17 @@ public class ServicesEndPoint {
 			return validationReport;
 
 		try {
-			Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass = new HashMap<Class<?>, Map<Reference<?>, Reference<?>>>();
+			ReferenceReplacer replacer = new ReferenceReplacer();
 
 			for (ModifiedFeature<RioolObject> feature : features) {
 				RioolObject object = feature.unwrap();
-				Long key = feature.getKey();
+				Object key = feature.getKey();
 				ModificationAction action = feature.getAction();
 
 				switch (action) {
 				case create:
 					rioolStore.persist(object);
-					ReferenceInfo.addReplacement(replacementsByClass, object
-							.getClass(), new Reference<RioolObject>(
+					replacer.put(object.getClass(), new Reference<RioolObject>(
 							ReferenceType.key, key.toString()),
 							new Reference<RioolObject>(object.getId()));
 
@@ -514,15 +551,7 @@ public class ServicesEndPoint {
 				}
 			}
 
-			for (ModifiedFeature<RioolObject> feature : features) {
-				if (feature.getAction() != ModificationAction.delete) {
-					RioolObject object = feature.unwrap();
-					ReferenceInfo
-							.replaceReferences(object, replacementsByClass);
-					object = rioolStore.merge(object);
-					feature.wrap(object);
-				}
-			}
+			replaceReferences(features, replacer);
 
 			rioolStore.flush();
 
@@ -568,7 +597,7 @@ public class ServicesEndPoint {
 	}
 
 	protected ValidationResult validate(RioolObject object, String layerBodId,
-			Long key, Class<?>... groups) {
+			Object key, Class<?>... groups) {
 
 		Set<ConstraintViolation<RioolObject>> violations = rioolStore.validate(
 				object, groups);
@@ -722,35 +751,44 @@ public class ServicesEndPoint {
 	@POST
 	@Path("/{mapId}/DataServer")
 	@Consumes("application/xml")
-	@Produces("application/xml")
+	@Produces({ "application/xml", "application/json" })
 	@SuppressWarnings("unchecked")
 	@Transactional
-	public Object _import(@PathParam("mapId") String mapId, InputStream in)
-			throws IOException, TransformerException, JAXBException,
-			IllegalStateException, SystemException, SecurityException,
-			NotSupportedException, RollbackException, HeuristicMixedException,
-			HeuristicRollbackException {
+	public ValidationReport _import(@PathParam("mapId") String mapId,
+			InputStream in) throws IOException, TransformerException,
+			JAXBException, IllegalStateException, SystemException,
+			SecurityException, NotSupportedException, RollbackException,
+			HeuristicMixedException, HeuristicRollbackException {
 
 		Riool riool = new GML2Model().transform(in);
 		List<RioolObject> objects = riool.getObjects();
+
+		ReferenceReplacer replacer = getCodeReferenceReplacer();
+
 		List<ModifiedFeature<RioolObject>> features = new ArrayList<ModifiedFeature<RioolObject>>(
 				objects.size());
 
-		long key = 0L;
 		for (RioolObject object : objects) {
-			Long namespaceId = object.getNamespaceId();
+			String key = object.getNamespaceId().getValue() + ":"
+					+ object.getAlternatieveId();
+
+			replacer.replace(object);
+
+			Object namespaceId = object.getNamespaceId().getValue();
 			String alternatieveId = object.getAlternatieveId();
 
 			ModificationAction action = ModificationAction.create;
-			if (rioolStore.exists((Class<RioolObject>) object.getClass(),
-					namespaceId, alternatieveId)) {
+			if (namespaceId instanceof Long
+					&& rioolStore.exists(
+							(Class<RioolObject>) object.getClass(),
+							(Long) namespaceId, alternatieveId)) {
 				action = ModificationAction.update;
 			}
 
-			features.add(new ModifiedFeature<RioolObject>(object, key++, action));
+			features.add(new ModifiedFeature<RioolObject>(object, key, action));
 		}
 
-		return push(mapId, features);
+		return test(mapId, features);
 	}
 
 	@GET

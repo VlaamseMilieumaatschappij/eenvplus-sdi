@@ -788,7 +788,7 @@ public class ServicesEndPoint {
 			features.add(new ModifiedFeature<RioolObject>(object, key, action));
 		}
 
-		return test(mapId, features);
+		return push(mapId, features).getValidation();
 	}
 
 	@GET

@@ -2,6 +2,9 @@ package be.vmm.eenvplus.sdi.model;
 
 import java.util.Date;
 
+import be.vmm.eenvplus.sdi.model.code.Namespace;
+import be.vmm.eenvplus.sdi.model.type.Reference;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 public interface RioolObject {
@@ -30,9 +33,9 @@ public interface RioolObject {
 
 	public void setAlternatieveId(String alternatieveId);
 
-	public Long getNamespaceId();
+	public Reference<Namespace> getNamespaceId();
 
-	public void setNamespaceId(Long namespaceId);
+	public void setNamespaceId(Reference<Namespace> namespaceId);
 
 	public Geometry getGeom();
 

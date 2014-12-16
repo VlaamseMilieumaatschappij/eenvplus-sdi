@@ -85,14 +85,14 @@ public class RioolLink implements RioolObject {
 	protected String alternatieveId;
 	@NotNull
 	@Refers(entityType = Namespace.class, groups = PrePersist.class)
-	protected Long namespaceId;
+	protected Reference<Namespace> namespaceId;
 
 	@NotNull
 	@Refers(entityType = RioolLinkType.class, groups = PrePersist.class)
-	protected Long rioolLinkTypeId;
+	protected Reference<RioolLinkType> rioolLinkTypeId;
 	@NotNull
 	@Refers(entityType = SewerWaterType.class, groups = PrePersist.class)
-	protected Long sewerWaterTypeId;
+	protected Reference<SewerWaterType> sewerWaterTypeId;
 
 	@NotNull
 	@DecimalMin("250")
@@ -176,27 +176,27 @@ public class RioolLink implements RioolObject {
 		this.alternatieveId = alternatieveId;
 	}
 
-	public Long getNamespaceId() {
+	public Reference<Namespace> getNamespaceId() {
 		return namespaceId;
 	}
 
-	public void setNamespaceId(Long namespaceId) {
+	public void setNamespaceId(Reference<Namespace> namespaceId) {
 		this.namespaceId = namespaceId;
 	}
 
-	public Long getRioolLinkTypeId() {
+	public Reference<RioolLinkType> getRioolLinkTypeId() {
 		return rioolLinkTypeId;
 	}
 
-	public void setRioolLinkTypeId(Long rioolLinkTypeId) {
+	public void setRioolLinkTypeId(Reference<RioolLinkType> rioolLinkTypeId) {
 		this.rioolLinkTypeId = rioolLinkTypeId;
 	}
 
-	public Long getSewerWaterTypeId() {
+	public Reference<SewerWaterType> getSewerWaterTypeId() {
 		return sewerWaterTypeId;
 	}
 
-	public void setSewerWaterTypeId(Long sewerWaterTypeId) {
+	public void setSewerWaterTypeId(Reference<SewerWaterType> sewerWaterTypeId) {
 		this.sewerWaterTypeId = sewerWaterTypeId;
 	}
 
@@ -290,7 +290,8 @@ public class RioolLink implements RioolObject {
 			"SELECT count(a) > 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any, groups = PostPersist.class)
 	protected Map<String, Object> getCheckStartPersleidingParams() {
 
-		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {
+		if (Long.valueOf(2L/* persleiding */).equals(
+				rioolLinkTypeId.getValue())) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("koppelpuntId", startKoppelPuntId.getValue());
 			return params;
@@ -304,7 +305,8 @@ public class RioolLink implements RioolObject {
 			"SELECT count(a) = 0 FROM RioolAppurtenance a WHERE rioolAppurtenanceTypeId = 7 AND (a.koppelpuntId = :koppelpuntId)" }, condition = AssertQueryCondition.any, groups = PostPersist.class)
 	protected Map<String, Object> getCheckEndPersleidingParams() {
 
-		if (rioolLinkTypeId != null && rioolLinkTypeId == 2L/* persleiding */) {
+		if (Long.valueOf(2L/* persleiding */).equals(
+				rioolLinkTypeId.getValue())) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("koppelpuntId", endKoppelPuntId.getValue());
 			return params;

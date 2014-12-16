@@ -6,6 +6,8 @@ import javax.persistence.SynchronizationType;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import be.vmm.eenvplus.sdi.model.type.Reference.ReferenceType;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 @SuppressWarnings("rawtypes")
@@ -35,12 +37,14 @@ public class RefersNodeValidator implements
 				|| value.getGeometry() == null)
 			return true;
 
+		if (value.getReference().getType() != ReferenceType.id)
+			return false;
+
 		try {
 			Object node = entityManager.find(nodeType, value.getReference()
 					.getValue());
-			if (node == null) {
+			if (node == null)
 				return false;
-			}
 
 			Geometry geometry = value.getGeometry(nodePosition);
 

@@ -48,7 +48,7 @@ public class Reference<T> implements Serializable {
 	protected ReferenceType type;
 	protected Object value;
 
-	public Reference(long id) {
+	public Reference(Long id) {
 		this.type = ReferenceType.id;
 		this.value = id;
 	}

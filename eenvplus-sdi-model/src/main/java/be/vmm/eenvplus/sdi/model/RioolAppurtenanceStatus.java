@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
 import be.vmm.eenvplus.sdi.model.code.Status;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
+import be.vmm.eenvplus.sdi.model.type.Reference;
 
 @Entity
 @Table(name = "rioolappurtenance_status", schema = "gengis")
@@ -32,7 +33,7 @@ public class RioolAppurtenanceStatus {
 
 	@NotNull
 	@Refers(entityType = Status.class, groups = PrePersist.class)
-	protected Long statusId;
+	protected Reference<Status> statusId;
 
 	protected Date geldigVanaf;
 	protected Date geldigTot;
@@ -45,11 +46,11 @@ public class RioolAppurtenanceStatus {
 		this.id = id;
 	}
 
-	public Long getStatusId() {
+	public Reference<Status> getStatusId() {
 		return statusId;
 	}
 
-	public void setStatusId(Long statusId) {
+	public void setStatusId(Reference<Status> statusId) {
 		this.statusId = statusId;
 	}
 

@@ -28,6 +28,7 @@ import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
 import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
 import be.vmm.eenvplus.sdi.model.jaxb.GeometryXmlAdapter;
+import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
 
@@ -61,7 +62,7 @@ public class KoppelPunt implements RioolObject {
 	protected String alternatieveId;
 	@NotNull
 	@Refers(entityType = Namespace.class, groups = PrePersist.class)
-	protected Long namespaceId;
+	protected Reference<Namespace> namespaceId;
 
 	@NotNull
 	@GeometryType("Point")
@@ -119,11 +120,11 @@ public class KoppelPunt implements RioolObject {
 		this.alternatieveId = alternatieveId;
 	}
 
-	public Long getNamespaceId() {
+	public Reference<Namespace> getNamespaceId() {
 		return namespaceId;
 	}
 
-	public void setNamespaceId(Long namespaceId) {
+	public void setNamespaceId(Reference<Namespace> namespaceId) {
 		this.namespaceId = namespaceId;
 	}
 

@@ -80,11 +80,11 @@ public class RioolAppurtenance implements RioolObject {
 	protected String alternatieveId;
 	@NotNull
 	@Refers(entityType = Namespace.class, groups = PrePersist.class)
-	protected Long namespaceId;
+	protected Reference<Namespace> namespaceId;
 
 	@NotNull
 	@Refers(entityType = RioolAppurtenanceType.class, groups = PrePersist.class)
-	protected Long rioolAppurtenanceTypeId;
+	protected Reference<RioolAppurtenanceType> rioolAppurtenanceTypeId;
 
 	protected String label;
 	protected String omschrijving;
@@ -157,19 +157,20 @@ public class RioolAppurtenance implements RioolObject {
 		this.alternatieveId = alternatieveId;
 	}
 
-	public Long getNamespaceId() {
+	public Reference<Namespace> getNamespaceId() {
 		return namespaceId;
 	}
 
-	public void setNamespaceId(Long namespaceId) {
+	public void setNamespaceId(Reference<Namespace> namespaceId) {
 		this.namespaceId = namespaceId;
 	}
 
-	public Long getRioolAppurtenanceTypeId() {
+	public Reference<RioolAppurtenanceType> getRioolAppurtenanceTypeId() {
 		return rioolAppurtenanceTypeId;
 	}
 
-	public void setRioolAppurtenanceTypeId(Long rioolAppurtenanceTypeId) {
+	public void setRioolAppurtenanceTypeId(
+			Reference<RioolAppurtenanceType> rioolAppurtenanceTypeId) {
 		this.rioolAppurtenanceTypeId = rioolAppurtenanceTypeId;
 	}
 
@@ -233,7 +234,8 @@ public class RioolAppurtenance implements RioolObject {
 	// groups = PostPersist.class)
 	protected Map<String, Object> getCheckUitlaatParams() {
 
-		if (rioolAppurtenanceTypeId != null && rioolAppurtenanceTypeId == 6L/* dischargeStructure */) {
+		if (Long.valueOf(6L/* dischargeStructure */).equals(
+				rioolAppurtenanceTypeId)) {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("koppelPuntId", koppelPuntId.getValue());
 			return params;

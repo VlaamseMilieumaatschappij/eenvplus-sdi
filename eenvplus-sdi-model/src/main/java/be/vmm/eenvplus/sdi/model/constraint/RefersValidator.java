@@ -6,9 +6,13 @@ import javax.persistence.SynchronizationType;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class RefersValidator implements ConstraintValidator<Refers, Object> {
+import be.vmm.eenvplus.sdi.model.type.Reference;
+import be.vmm.eenvplus.sdi.model.type.Reference.ReferenceType;
 
-	@PersistenceContext(unitName = "eenvplus" , synchronization = SynchronizationType.UNSYNCHRONIZED)
+@SuppressWarnings("rawtypes")
+public class RefersValidator implements ConstraintValidator<Refers, Reference> {
+
+	@PersistenceContext(unitName = "eenvplus", synchronization = SynchronizationType.UNSYNCHRONIZED)
 	protected EntityManager entityManager;
 
 	protected Class<?> entityType;
@@ -19,13 +23,16 @@ public class RefersValidator implements ConstraintValidator<Refers, Object> {
 	}
 
 	@Override
-	public boolean isValid(Object value, ConstraintValidatorContext context) {
+	public boolean isValid(Reference value, ConstraintValidatorContext context) {
 
 		if (value == null)
 			return true;
 
+		if (value.getType() != ReferenceType.id)
+			return false;
+
 		try {
-			return entityManager.find(entityType, value) != null;
+			return entityManager.find(entityType, value.getValue()) != null;
 		} catch (Exception e) {
 			return false;
 		}

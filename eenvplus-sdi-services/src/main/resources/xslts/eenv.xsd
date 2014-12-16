@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 (x64) (http://www.altova.com) by Lennert De Feyter (GIM nv) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:eenv="http://eenv.vmm.be/" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmlexr="http://www.opengis.net/gml/3.3/exr" xmlns:us-net-sw="http://inspire.ec.europa.eu/schemas/us-net-sw/3.0" xmlns:us-net-common="http://inspire.ec.europa.eu/schemas/us-net-common/3.0" targetNamespace="http://eenv.vmm.be/" elementFormDefault="qualified" version="0.01">
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/us-net-common/3.0" schemaLocation="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityNetworksCommon.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="http://inspire.ec.europa.eu/schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/us-net-sw/3.0" schemaLocation="http://inspire.ec.europa.eu/schemas/us-net-sw/3.0/SewerNetwork.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.3/exr" schemaLocation="http://schemas.opengis.net/gml/3.3/extdEncRule.xsd"/>
+	<element name="AlternatieveIdentificator" type="eenv:AlternatieveIdentificatorType" substitutionGroup="gml:AbstractObject"/>
+	<complexType name="AlternatieveIdentificatorType">
+		<sequence>
+			<element name="alternatieveIdentificator" type="string"/>
+			<element name="alternatieveIdentificatorType" type="gml:ReferenceType">
+				<annotation>
+					<appinfo>
+						<targetCodeList xmlns="http://www.opengis.net/gml/3.3/exr">AlternatieveIdentificatorTypeValue</targetCodeList>
+					</appinfo>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="AlternatieveIdentificatorPropertyType">
+		<sequence>
+			<element ref="eenv:AlternatieveIdentificator"/>
+		</sequence>
+	</complexType>
+	<element name="KoppelPunt" type="eenv:KoppelPuntType" substitutionGroup="us-net-common:UtilityNode"/>
+	<complexType name="KoppelPuntType">
+		<complexContent>
+			<extension base="us-net-common:UtilityNodeType">
+				<sequence>
+					<element name="alternatieveIdentificator" type="eenv:AlternatieveIdentificatorPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="KoppelPuntPropertyType">
+		<sequence minOccurs="0">
+			<element ref="eenv:KoppelPunt"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="RioolAppurtenance" type="eenv:RioolAppurtenanceType" substitutionGroup="us-net-common:Appurtenance"/>
+	<!--complexType name="BASE_RioolAppurtenanceType">
+		<complexContent>
+			<restriction base="us-net-common:AppurtenanceType">
+				<sequence>
+					<element name="appurtenanceType" type="gml:ReferenceType" nillable="false">
+						<annotation>
+							<documentation></documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</restriction>
+		</complexContent>
+	</complexType-->
+	<complexType name="RioolAppurtenanceType">
+		<complexContent>
+			<extension base="us-net-common:AppurtenanceType">
+				<sequence>
+					<element name="label" type="string" minOccurs="0"/>
+					<element name="omschrijving" type="string" minOccurs="0"/>
+					<element name="vhasegmentid" type="integer" minOccurs="0"/>
+					<element name="alternatieveIdentificator" type="eenv:AlternatieveIdentificatorPropertyType" minOccurs="0"/>
+					<element name="koppelPunt" type="gml:ReferenceType" minOccurs="1">
+						<annotation>
+							<appinfo>
+								<targetElement xmlns="http://www.opengis.net/gml/3.2">eenv:KoppelPunt</targetElement>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="statussen" type="eenv:StatusPropertyType" minOccurs="1"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="RioolAppurtenancePropertyType">
+		<sequence minOccurs="0">
+			<element ref="eenv:RioolAppurtenance"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="RioolLink" type="eenv:RioolLinkType" substitutionGroup="us-net-sw:SewerPipe"/>
+	<complexType name="RioolLinkType">
+		<complexContent>
+			<extension base="us-net-sw:SewerPipeType">
+				<sequence>
+					<element name="label" type="string" minOccurs="0"/>
+					<element name="omschrijving" type="string" minOccurs="0"/>
+					<element name="alternatieveIdentificator" type="eenv:AlternatieveIdentificatorPropertyType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="statussen" type="eenv:StatusPropertyType" minOccurs="0"/>
+					<element name="rioolLinkType" type="gml:ReferenceType">
+						<annotation>
+							<appinfo>
+								<targetCodeList xmlns="http://www.opengis.net/gml/3.3/exr">rioolLinkType</targetCodeList>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="straatid" type="integer" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="RioolLinkPropertyType">
+		<sequence minOccurs="0">
+			<element ref="eenv:RioolLink"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Status" type="eenv:StatusType"/>
+	<complexType name="StatusType">
+		<sequence>
+			<element name="statusType" type="gml:ReferenceType">
+				<annotation>
+					<appinfo>
+						<targetCodeList xmlns="http://www.opengis.net/gml/3.3/exr">StatusTypeValue</targetCodeList>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="geldigVanaf" type="dateTime" minOccurs="0"/>
+			<element name="geldigTot" type="dateTime" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="StatusPropertyType">
+		<sequence>
+			<element ref="eenv:Status" minOccurs="1" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<element name="UtilityNetwork" type="eenv:UtilityNetworkType" substitutionGroup="us-net-common:UtilityNetwork"/>
+	<complexType name="UtilityNetworkType">
+		<complexContent>
+			<extension base="us-net-common:UtilityNetworkType">
+				<sequence>
+					<element name="user_id" type="string"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="UtilityNetworkPropertyType">
+		<sequence minOccurs="0">
+			<element ref="eenv:UtilityNetwork"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

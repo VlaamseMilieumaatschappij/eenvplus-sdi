@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gml:FeatureCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:net="urn:x-inspire:specification:gmlas:Network:3.2" xmlns:gmlexr="http://www.opengis.net/gml/3.3/exr" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:us-net-common="http://inspire.ec.europa.eu/schemas/us-net-common/3.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:us-net-sw="http://inspire.ec.europa.eu/schemas/us-net-sw/3.0" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:eenv="http://eenv.vmm.be/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gn="urn:x-inspire:specification:gmlas:GeographicalNames:3.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:pfx0="http://www.w3.org/1999/xhtml" xmlns:base-3.2="urn:x-inspire:specification:gmlas:BaseTypes:3.2" gml:id="idaa8c3c5c-53c4-441a-88b0-cf69a0ac8292" xsi:schemaLocation="http://eenv.vmm.be/ eenv.xsd">
+	<gml:boundedBy>
+		<gml:Envelope srsName="EPSG:31370" srsDimension="2">
+			<gml:lowerCorner>165000 165000</gml:lowerCorner>
+			<gml:upperCorner>165001 165001</gml:upperCorner>
+		</gml:Envelope>
+	</gml:boundedBy>
+	<gml:featureMember>
+		<eenv:RioolLink gml:id="ID_5e44132e-4e56-49e9-963e-762856a06a0b">
+			<net:beginLifespanVersion>2014-12-12T11:40:27</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>1</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:link xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:1_UTILITYLINK"/>
+			<us-net-common:currentStatus xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition>underground</us-net-common:verticalPosition>
+			<us-net-common:warningType xsi:nil="true"/>
+			<us-net-common:pipeDiameter uom="urn:ogc:def:uom:OGC::m">1</us-net-common:pipeDiameter>
+			<us-net-common:pressure uom="urn:ogc:def:uom:OGC::bar">1</us-net-common:pressure>
+			<us-net-sw:sewerWaterType xlink:href="http://eenv.vmm.be/codelists/sewerwatertype/storm"/>
+			<eenv:label>buis 1</eenv:label>
+			<eenv:omschrijving>Dit is een test</eenv:omschrijving>
+			<eenv:statussen>
+				<eenv:Status>
+					<eenv:statusType xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+					<eenv:geldigVanaf>2014-12-12T11:40:27</eenv:geldigVanaf>
+				</eenv:Status>
+				<eenv:Status>
+					<eenv:statusType xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/disused"/>
+					<eenv:geldigVanaf>2013-12-11T16:25:58</eenv:geldigVanaf>
+					<eenv:geldigTot>2014-12-12T11:40:27</eenv:geldigTot>
+				</eenv:Status>
+			</eenv:statussen>
+			<eenv:rioolLinkType xlink:href="http://eenv.vmm.be/codelists/rioollinktype/gracht"/>
+		</eenv:RioolLink>
+	</gml:featureMember>
+	<gml:featureMember>
+		<us-net-common:UtilityLink gml:id="ID_ac9ebf0d-adf1-4280-8a2e-16da06c30b9d">
+			<net:beginLifespanVersion>2014-12-12T11:40:27</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>1_UTILITYLINK</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:centrelineGeometry>
+				<gml:LineString gml:id="ID_ac9ebf0d-adf1-4280-8a2e-16da06c30b9d-0" srsName="EPSG:31370" srsDimension="2">
+					<gml:posList>165000 165000 165001 165000</gml:posList>
+				</gml:LineString>
+			</net:centrelineGeometry>
+			<net:fictitious>false</net:fictitious>
+			<net:endNode xlink:href="http://eenv.vmm.be/Koppelpunt/VMM:B"/>
+			<net:startNode xlink:href="http://eenv.vmm.be/Koppelpunt/VMM:A"/>
+			<us-net-common:currentStatus xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition>underground</us-net-common:verticalPosition>
+		</us-net-common:UtilityLink>
+	</gml:featureMember>
+	<gml:featureMember>
+		<us-net-common:UtilityLink gml:id="ID_1fec2f62-651c-42f2-98a3-f95256befa10">
+			<net:beginLifespanVersion>2014-12-12T11:40:27</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>2_UTILITYLINK</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:centrelineGeometry>
+				<gml:LineString gml:id="ID_1fec2f62-651c-42f2-98a3-f95256befa10-0" srsName="EPSG:31370" srsDimension="2">
+					<gml:posList>165001 165000 165001 165001</gml:posList>
+				</gml:LineString>
+			</net:centrelineGeometry>
+			<net:fictitious>false</net:fictitious>
+			<net:endNode xlink:href="http://eenv.vmm.be/Koppelpunt/VMM:C"/>
+			<net:startNode xlink:href="http://eenv.vmm.be/Koppelpunt/VMM:B"/>
+			<us-net-common:currentStatus xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition>underground</us-net-common:verticalPosition>
+		</us-net-common:UtilityLink>
+	</gml:featureMember>
+	<gml:featureMember>
+		<eenv:RioolLink gml:id="ID_81d43f0e-71a2-4249-80cf-772f6aa384a6">
+			<net:beginLifespanVersion>2014-12-12T11:40:27</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>2</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:link xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:2_UTILITYLINK"/>
+			<us-net-common:currentStatus xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition>underground</us-net-common:verticalPosition>
+			<us-net-common:warningType xsi:nil="true"/>
+			<us-net-common:pipeDiameter uom="urn:ogc:def:uom:OGC::m">2</us-net-common:pipeDiameter>
+			<us-net-common:pressure uom="urn:ogc:def:uom:OGC::bar">1</us-net-common:pressure>
+			<us-net-sw:sewerWaterType xlink:href="http://eenv.vmm.be/codelists/sewerwatertype/storm"/>
+			<eenv:label>buis 2</eenv:label>
+			<eenv:omschrijving>Dit is een test</eenv:omschrijving>
+			<eenv:statussen>
+				<eenv:Status>
+					<eenv:statusType xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+					<eenv:geldigVanaf>2014-12-12T11:40:27</eenv:geldigVanaf>
+				</eenv:Status>
+				<eenv:Status>
+					<eenv:statusType xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/projected"/>
+					<eenv:geldigVanaf>2013-12-10T16:25:58</eenv:geldigVanaf>
+					<eenv:geldigTot>2014-12-12T11:40:27</eenv:geldigTot>
+				</eenv:Status>
+			</eenv:statussen>
+			<eenv:rioolLinkType xlink:href="http://eenv.vmm.be/codelists/rioollinktype/gravitaireleiding"/>
+		</eenv:RioolLink>
+	</gml:featureMember>
+	<gml:featureMember>
+		<eenv:RioolAppurtenance gml:id="ID_a7b71c19-dc69-46c3-b22f-08a16625c2c9">
+			<net:beginLifespanVersion>2014-12-12T11:40:27</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>1</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:geometry>
+				<gml:Point gml:id="ID_a7b71c19-dc69-46c3-b22f-08a16625c2c9-0" srsName="EPSG:31370" srsDimension="2">
+					<gml:pos>165001 165000</gml:pos>
+				</gml:Point>
+			</net:geometry>
+			<us-net-common:currentStatus xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition>underground</us-net-common:verticalPosition>
+			<us-net-common:appurtenanceType xlink:href="http://eenv.vmm.be/codelists/rioolappurtenancetype/overstort"/>
+			<eenv:label>buis 1</eenv:label>
+			<eenv:omschrijving>Dit is een test</eenv:omschrijving>
+			<eenv:koppelPunt xlink:href="http://eenv.vmm.be/Koppelpunt/VMM:B"/>
+			<eenv:statussen>
+				<eenv:Status>
+					<eenv:statusType xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/functional"/>
+					<eenv:geldigVanaf>2014-12-12T11:40:27</eenv:geldigVanaf>
+				</eenv:Status>
+				<eenv:Status>
+					<eenv:statusType xlink:href="http://inspire.ec.europa.eu/codelist/ConditionOfFacilityValue/disused"/>
+					<eenv:geldigVanaf>2013-12-11T16:25:58</eenv:geldigVanaf>
+					<eenv:geldigTot>2014-12-12T11:40:27</eenv:geldigTot>
+				</eenv:Status>
+			</eenv:statussen>
+		</eenv:RioolAppurtenance>
+	</gml:featureMember>
+	<gml:featureMember>
+		<eenv:KoppelPunt gml:id="ID_113d324b-ffe2-496a-ab7e-c03884ab888f">
+			<net:beginLifespanVersion>2014-12-12T11:40:27</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>A</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:geometry>
+				<gml:Point gml:id="ID_113d324b-ffe2-496a-ab7e-c03884ab888f-0" srsName="EPSG:31370" srsDimension="2">
+					<gml:pos>165000 165000</gml:pos>
+				</gml:Point>
+			</net:geometry>
+			<net:spokeStart xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:1_UTILITYLINK"/>
+			<us-net-common:currentStatus xsi:nil="true"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition xsi:nil="true"/>
+		</eenv:KoppelPunt>
+	</gml:featureMember>
+	<gml:featureMember>
+		<eenv:KoppelPunt gml:id="ID_0e29b013-26a1-47cf-ac16-1f5c4f535240">
+			<net:beginLifespanVersion>2014-12-12T11:40:28</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>B</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:geometry>
+				<gml:Point gml:id="ID_0e29b013-26a1-47cf-ac16-1f5c4f535240-0" srsName="EPSG:31370" srsDimension="2">
+					<gml:pos>165001 165000</gml:pos>
+				</gml:Point>
+			</net:geometry>
+			<net:spokeEnd xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:1_UTILITYLINK"/>
+			<net:spokeStart xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:2_UTILITYLINK"/>
+			<us-net-common:currentStatus xsi:nil="true"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition xsi:nil="true"/>
+		</eenv:KoppelPunt>
+	</gml:featureMember>
+	<gml:featureMember>
+		<eenv:KoppelPunt gml:id="ID_a27fd28d-75d7-4949-8ba1-52b87cb6c0b6">
+			<net:beginLifespanVersion>2014-12-12T11:40:28</net:beginLifespanVersion>
+			<net:inspireId>
+				<base-3.2:Identifier>
+					<base-3.2:localId>C</base-3.2:localId>
+					<base-3.2:namespace>VMM</base-3.2:namespace>
+				</base-3.2:Identifier>
+			</net:inspireId>
+			<net:inNetwork xlink:href="http://eenv.vmm.be/UtilityNetwork/VMM:sewer"/>
+			<net:geometry>
+				<gml:Point gml:id="ID_a27fd28d-75d7-4949-8ba1-52b87cb6c0b6-0" srsName="EPSG:31370" srsDimension="2">
+					<gml:pos>165001 165001</gml:pos>
+				</gml:Point>
+			</net:geometry>
+			<net:spokeEnd xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:2_UTILITYLINK"/>
+			<us-net-common:currentStatus xsi:nil="true"/>
+			<us-net-common:validFrom xsi:nil="true"/>
+			<us-net-common:verticalPosition xsi:nil="true"/>
+		</eenv:KoppelPunt>
+	</gml:featureMember>
+	<gml:featureMember>
+		<eenv:UtilityNetwork gml:id="ID_f193448d-8a44-4714-b80f-639809d71d99">
+			<net:elements xlink:href="http://eenv.vmm.be/RioolLink/VMM:1"/>
+			<net:elements xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:1_UTILITYLINK"/>
+			<net:elements xlink:href="http://inspire.ec.europa.eu/schemas/us-net-common/3.0/UtilityLink/VMM:2_UTILITYLINK"/>
+			<net:elements xlink:href="http://eenv.vmm.be/RioolLink/VMM:2"/>
+			<net:elements xlink:href="http://eenv.vmm.be/RioolAppurtenance/VMM:1"/>
+			<net:elements xlink:href="http://eenv.vmm.be/KoppelPunt/VMM:A"/>
+			<net:elements xlink:href="http://eenv.vmm.be/KoppelPunt/VMM:B"/>
+			<net:elements xlink:href="http://eenv.vmm.be/KoppelPunt/VMM:C"/>
+			<us-net-common:utilityNetworkType xlink:href="http://inspire.ec.europa.eu/codelist/UtilityNetworkTypeExtendedValue/VMM:sewer"/>
+			<us-net-common:authorityRole nilReason="true"/>
+			<us-net-common:disclaimer>
+				<gmd:PT_FreeText>
+					<gmd:textGroup>
+						<gmd:LocalisedCharacterString>Niet inspringen</gmd:LocalisedCharacterString>
+					</gmd:textGroup>
+				</gmd:PT_FreeText>
+			</us-net-common:disclaimer>
+			<eenv:user_id>id092093</eenv:user_id>
+		</eenv:UtilityNetwork>
+	</gml:featureMember>
+</gml:FeatureCollection>

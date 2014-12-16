@@ -1,20 +1,26 @@
 package be.vmm.eenvplus.sdi.api;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
+
 import be.vmm.eenvplus.sdi.api.feature.Feature;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+@XmlType
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @JsonInclude(Include.NON_NULL)
 public class ModificationResult {
 
 	protected String layerBodId;
-	protected Long key;
+	protected Object key;
 	protected ModificationAction action;
 
 	protected Feature<Object> feature;
 
-	public ModificationResult(String layerBodId, Long key,
+	public ModificationResult(String layerBodId, Object key,
 			ModificationAction action, Feature<Object> feature) {
 		this.layerBodId = layerBodId;
 		this.key = key;
@@ -22,7 +28,7 @@ public class ModificationResult {
 		this.feature = feature;
 	}
 
-	public ModificationResult(String layerBodId, Long key,
+	public ModificationResult(String layerBodId, Object key,
 			ModificationAction action) {
 		this.layerBodId = layerBodId;
 		this.key = key;
@@ -37,11 +43,11 @@ public class ModificationResult {
 		this.layerBodId = layerBodId;
 	}
 
-	public Long getKey() {
+	public Object getKey() {
 		return key;
 	}
 
-	public void setKey(Long key) {
+	public void setKey(Object key) {
 		this.key = key;
 	}
 

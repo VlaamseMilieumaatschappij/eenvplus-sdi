@@ -7,14 +7,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ModifiedFeature<T> extends Feature<T> {
 
-	protected Long key;
+	protected Object key;
 	protected ModificationAction action;
 
 	public ModifiedFeature(T object) {
 		super(object);
 	}
 
-	public ModifiedFeature(T object, Long key, ModificationAction action) {
+	public ModifiedFeature(T object, Object key, ModificationAction action) {
 		super(object);
 		this.key = key;
 		this.action = action;
@@ -29,11 +29,11 @@ public class ModifiedFeature<T> extends Feature<T> {
 	}
 
 	@JsonProperty(required = true)
-	public Long getKey() {
+	public Object getKey() {
 		return key;
 	}
 
-	public void setKey(Long key) {
+	public void setKey(Object key) {
 		this.key = key;
 	}
 

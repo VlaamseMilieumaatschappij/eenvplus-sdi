@@ -1,10 +1,20 @@
 package be.vmm.eenvplus.sdi.api;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class ValidationMessage {
 
 	protected ValidationLevel level;
 	protected String path;
 	protected String description;
+
+	public ValidationMessage() {
+		level = ValidationLevel.info;
+	}
 
 	public ValidationMessage(ValidationLevel level, String path,
 			String description) {

@@ -48,9 +48,9 @@ public class ReferenceUserType implements UserType, Serializable {
 			SessionImplementor session) throws HibernateException, SQLException {
 		if (value instanceof Reference) {
 			if (((Reference<Object>) value).getType() == ReferenceType.id)
-				st.setLong(index, ((Reference<Object>) value).getValue());
+				st.setLong(index, (Long) ((Reference<Object>) value).getValue());
 			else
-				st.setLong(index, 0L);
+				st.setLong(index, -1L);
 		} else if (value instanceof Number) {
 			st.setLong(index, ((Number) value).longValue());
 		}

@@ -4,8 +4,8 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.util.Map;
 
-import be.vmm.eenvplus.sdi.api.json.FeatureInfo;
-import be.vmm.eenvplus.sdi.api.json.FeatureProperties;
+import be.vmm.eenvplus.sdi.api.feature.FeatureInfo;
+import be.vmm.eenvplus.sdi.api.feature.FeatureProperties;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;

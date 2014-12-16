@@ -14,13 +14,17 @@ public interface RioolObject {
 
 	public void setCreationDate(Date creationDate);
 
-	public Date getBeginLifeSpanVersion();
+	public Date getBeginLifespanVersion();
 
-	public void setBeginLifeSpanVersion(Date beginLifeSpanVersion);
+	public void setBeginLifespanVersion(Date beginLifespanVersion);
 
-	public Date getEndLifeSpanVersion();
+	public Date getEndLifespanVersion();
 
-	public void setEndLifeSpanVersion(Date endLifeSpanVersion);
+	public void setEndLifespanVersion(Date endLifespanVersion);
+
+	public String getUserId();
+
+	public void setUserId(String userId);
 
 	public String getAlternatieveId();
 
@@ -33,8 +37,4 @@ public interface RioolObject {
 	public Geometry getGeom();
 
 	public void setGeom(Geometry geom);
-
-	public String getUserId();
-
-	public void setUserId(String userId);
 }

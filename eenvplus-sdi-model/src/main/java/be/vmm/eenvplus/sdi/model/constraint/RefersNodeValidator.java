@@ -8,10 +8,11 @@ import javax.validation.ConstraintValidatorContext;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+@SuppressWarnings("rawtypes")
 public class RefersNodeValidator implements
 		ConstraintValidator<RefersNode, NodeValue> {
 
-	@PersistenceContext(unitName = "eenvplus" , synchronization = SynchronizationType.UNSYNCHRONIZED)
+	@PersistenceContext(unitName = "eenvplus", synchronization = SynchronizationType.UNSYNCHRONIZED)
 	protected EntityManager entityManager;
 
 	protected NodePosition nodePosition;
@@ -35,7 +36,8 @@ public class RefersNodeValidator implements
 			return true;
 
 		try {
-			Object node = entityManager.find(nodeType, value.getReference());
+			Object node = entityManager.find(nodeType, value.getReference()
+					.getValue());
 			if (node == null) {
 				return false;
 			}

@@ -2,10 +2,10 @@ package be.vmm.eenvplus.sdi.services;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,15 +13,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
-import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -29,7 +22,6 @@ import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 import javax.ws.rs.BeanParam;
@@ -41,6 +33,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.transform.TransformerException;
 
 import org.geotools.referencing.CRS;
 
@@ -56,35 +50,42 @@ import be.vmm.eenvplus.sdi.api.ValidationLevel;
 import be.vmm.eenvplus.sdi.api.ValidationMessage;
 import be.vmm.eenvplus.sdi.api.ValidationReport;
 import be.vmm.eenvplus.sdi.api.ValidationResult;
-import be.vmm.eenvplus.sdi.api.json.ExtentParam;
-import be.vmm.eenvplus.sdi.api.json.Feature;
-import be.vmm.eenvplus.sdi.api.json.FeatureInfo;
-import be.vmm.eenvplus.sdi.api.json.FeatureList;
-import be.vmm.eenvplus.sdi.api.json.GeometryParam;
-import be.vmm.eenvplus.sdi.api.json.ViewPortParam;
+import be.vmm.eenvplus.sdi.api.feature.Feature;
+import be.vmm.eenvplus.sdi.api.feature.FeatureInfo;
+import be.vmm.eenvplus.sdi.api.feature.FeatureList;
+import be.vmm.eenvplus.sdi.api.param.ExtentParam;
+import be.vmm.eenvplus.sdi.api.param.GeometryParam;
+import be.vmm.eenvplus.sdi.api.param.ViewPortParam;
 import be.vmm.eenvplus.sdi.freemarker.FreemarkerTemplateHandler;
+import be.vmm.eenvplus.sdi.model.Riool;
 import be.vmm.eenvplus.sdi.model.RioolObject;
+import be.vmm.eenvplus.sdi.model.code.Code;
 import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
 import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
+import be.vmm.eenvplus.sdi.model.store.RioolStore;
 import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.model.type.Reference.ReferenceType;
 import be.vmm.eenvplus.sdi.model.type.ReferenceInfo;
 import be.vmm.eenvplus.sdi.services.geolocator.CrabGeoLocator;
+import be.vmm.eenvplus.sdi.services.gml.GML2Model;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-@Stateful
+@Stateless
 @Path("/services")
 public class ServicesEndPoint {
 
+	public static int MAX_RESULTS_SEARCH = 10;
 	public static int MAX_RESULTS_IDENTIFY = 100;
 	public static int MAX_RESULTS_PULL = 1000;
 
 	@Resource
 	protected SessionContext sessionContext;
-	@PersistenceContext(unitName = "eenvplus")
-	protected EntityManager entityManager;
+
+	@Inject
+	protected RioolStore rioolStore;
+
 	@Inject
 	protected ValidatorFactory validatorFactory;
 
@@ -213,17 +214,18 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/MapServer/{layerBodId}/{featureId}")
 	@Produces("application/json")
-	public FeatureResult<Object> getFeature(@PathParam("mapId") String mapId,
+	public FeatureResult<RioolObject> getFeature(
+			@PathParam("mapId") String mapId,
 			@PathParam("layerBodId") String layerBodId,
 			@PathParam("featureId") Long featureId)
 			throws ClassNotFoundException {
 
-		Object object = entityManager.find(
-				FeatureInfo.getFeatureClass(layerBodId), featureId);
+		RioolObject object = rioolStore.getObject(
+				FeatureInfo.<RioolObject> getFeatureClass(layerBodId),
+				featureId);
 
-		return new FeatureResult<Object>(object != null ? new Feature<Object>(
-				entityManager.find(FeatureInfo.getFeatureClass(layerBodId),
-						featureId)) : null);
+		return new FeatureResult<RioolObject>(
+				object != null ? new Feature<RioolObject>(object) : null);
 	}
 
 	/**
@@ -252,10 +254,11 @@ public class ServicesEndPoint {
 		params.put("layerBodId", layerBodId);
 		params.put("featureId", featureId);
 
-		params.put(
-				"feature",
-				new Feature<Object>(entityManager.find(
-						FeatureInfo.getFeatureClass(layerBodId), featureId)));
+		RioolObject object = rioolStore.getObject(
+				FeatureInfo.<RioolObject> getFeatureClass(layerBodId),
+				featureId);
+
+		params.put("feature", new Feature<RioolObject>(object));
 
 		return templateHandler.evaluate("/templates/htmlPopup.fmt", null,
 				params);
@@ -287,10 +290,11 @@ public class ServicesEndPoint {
 		params.put("layerBodId", layerBodId);
 		params.put("featureId", featureId);
 
-		params.put(
-				"feature",
-				new Feature<Object>(entityManager.find(
-						FeatureInfo.getFeatureClass(layerBodId), featureId)));
+		RioolObject object = rioolStore.getObject(
+				FeatureInfo.<RioolObject> getFeatureClass(layerBodId),
+				featureId);
+
+		params.put("feature", new Feature<RioolObject>(object));
 
 		return templateHandler.evaluate("/templates/extendedHtmlPopup.fmt",
 				null, params);
@@ -326,7 +330,8 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/MapServer/identify")
 	@Produces("application/json")
-	public IdentifyResults<Object> identify(@PathParam("mapId") String mapId,
+	public IdentifyResults<RioolObject> identify(
+			@PathParam("mapId") String mapId,
 			@BeanParam GeometryParam geometry,
 			@QueryParam("layers") String layers,
 			@QueryParam("mapExtent") ExtentParam mapExtent,
@@ -341,30 +346,13 @@ public class ServicesEndPoint {
 
 			location = location.buffer(radius, 3);
 		}
-		location.setSRID(31370);
 
-		List<Object> results = new ArrayList<Object>();
+		List<RioolObject> results = rioolStore.query(
+				FeatureInfo.<RioolObject> getFeatureClasses(layers.split(",")),
+				location, MAX_RESULTS_IDENTIFY);
 
-		for (String layerBodId : layers.split(",")) {
-			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-			Class<Object> clazz = FeatureInfo.getFeatureClass(layerBodId);
-
-			CriteriaQuery<Object> criteria = builder.createQuery(clazz);
-			Root<Object> root = criteria.from(clazz);
-			criteria.select(root);
-
-			criteria.where(builder.equal(
-					builder.function("intersects", Boolean.class,
-							root.get("geom"), builder.literal(location)),
-					Boolean.TRUE));
-
-			TypedQuery<Object> query = entityManager.createQuery(criteria);
-			query.setMaxResults(MAX_RESULTS_IDENTIFY);
-			results.addAll(query.getResultList());
-		}
-
-		return new IdentifyResults<Object>(new FeatureList<Object>(results));
+		return new IdentifyResults<RioolObject>(new FeatureList<RioolObject>(
+				results));
 	}
 
 	/**
@@ -387,48 +375,21 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/MapServer/pull")
 	@Produces("application/json")
-	public List<Feature<Object>> pull(@PathParam("mapId") String mapId,
+	public List<Feature<RioolObject>> pull(@PathParam("mapId") String mapId,
 			@QueryParam("types") String types,
 			@QueryParam("extent") ExtentParam extent)
 			throws ClassNotFoundException {
-		
 
-		// Fix SRIDs
-		for (ModifiedFeature<RioolObject> feature : features) {
-			try {
-				feature.getGeometry().setSRID(31370);
-			} catch (Exception e) {
-			}
+		Geometry location = null;
+		if (extent != null) {
+			location = extent.getGeometry();
 		}
 
-		List<Object> results = new ArrayList<Object>();
+		List<RioolObject> results = rioolStore.query(
+				FeatureInfo.<RioolObject> getFeatureClasses(types.split(",")),
+				location, MAX_RESULTS_PULL);
 
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		for (String type : types.split(",")) {
-			@SuppressWarnings("unchecked")
-			Class<Object> clazz = (Class<Object>) Class.forName(type);
-
-			CriteriaQuery<Object> criteria = builder.createQuery(clazz);
-			Root<Object> root = criteria.from(clazz);
-			criteria.select(root);
-
-			if (extent != null) {
-				Geometry location = extent.getGeometry();
-				location.setSRID(31370);
-
-				criteria.where(builder.equal(
-						builder.function("intersects", Boolean.class,
-								root.get("geom"), builder.literal(location)),
-						Boolean.TRUE));
-			}
-
-			TypedQuery<Object> query = entityManager.createQuery(criteria);
-			query.setMaxResults(MAX_RESULTS_PULL);
-			results.addAll(query.getResultList());
-		}
-
-		return new FeatureList<Object>(results);
+		return new FeatureList<RioolObject>(results);
 	}
 
 	@POST
@@ -442,14 +403,10 @@ public class ServicesEndPoint {
 			NotSupportedException, SecurityException, RollbackException,
 			HeuristicMixedException, HeuristicRollbackException {
 
-		entityManager.setFlushMode(FlushModeType.COMMIT);
-
 		ValidationReport validationReport = validate(features, Default.class,
 				PrePersist.class);
 		if (!validationReport.isValid())
 			return new ModificationReport(false, validationReport);
-
-		Date date = new Date();
 
 		boolean completed = true;
 		Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass = new HashMap<Class<?>, Map<Reference<?>, Reference<?>>>();
@@ -464,28 +421,24 @@ public class ServicesEndPoint {
 
 			switch (action) {
 			case create:
-				object.setCreationDate(date);
-				object.setBeginLifeSpanVersion(date);
-				entityManager.persist(object);
+				rioolStore.persist(object);
 				results.add(new ModificationResult(layerBodId, key,
 						ModificationAction.create, new Feature<Object>(object)));
 				ReferenceInfo.addReplacement(replacementsByClass, object
 						.getClass(), new Reference<RioolObject>(
-						ReferenceType.key, key), new Reference<RioolObject>(
-						object.getId()));
+						ReferenceType.key, key.toString()),
+						new Reference<RioolObject>(object.getId()));
 
 				break;
 			case update:
-				object.setBeginLifeSpanVersion(date);
-				object = entityManager.merge(object);
+				object = rioolStore.merge(object);
 				feature.wrap(object);
 				results.add(new ModificationResult(layerBodId, key,
 						ModificationAction.update, new Feature<Object>(object)));
 
 				break;
 			case delete:
-				// Does a soft delete by setting endLifeSpanVersion
-				entityManager.remove(object);
+				rioolStore.remove(object);
 				results.add(new ModificationResult(layerBodId, key,
 						ModificationAction.delete));
 				break;
@@ -499,12 +452,12 @@ public class ServicesEndPoint {
 			if (feature.getAction() != ModificationAction.delete) {
 				RioolObject object = feature.unwrap();
 				ReferenceInfo.replaceReferences(object, replacementsByClass);
-				object = entityManager.merge(object);
+				object = rioolStore.merge(object);
 				feature.wrap(object);
 			}
 		}
 
-		entityManager.flush();
+		rioolStore.flush();
 
 		validationReport = validate(features);
 
@@ -526,51 +479,36 @@ public class ServicesEndPoint {
 			throws IllegalStateException, SystemException,
 			NotSupportedException {
 
-		// Fix SRIDs
-		for (ModifiedFeature<RioolObject> feature : features) {
-			try {
-				feature.getGeometry().setSRID(31370);
-			} catch (Exception e) {
-			}
-		}
-
-		entityManager.setFlushMode(FlushModeType.COMMIT);
-
 		ValidationReport validationReport = validate(features, Default.class,
 				PrePersist.class);
 		if (!validationReport.isValid())
 			return validationReport;
 
 		try {
-
-			Date date = new Date();
-
 			Map<Class<?>, Map<Reference<?>, Reference<?>>> replacementsByClass = new HashMap<Class<?>, Map<Reference<?>, Reference<?>>>();
 
 			for (ModifiedFeature<RioolObject> feature : features) {
 				RioolObject object = feature.unwrap();
+				Long key = feature.getKey();
 				ModificationAction action = feature.getAction();
 
 				switch (action) {
 				case create:
-					object.setCreationDate(date);
-					object.setBeginLifeSpanVersion(date);
-					entityManager.persist(object);
+					rioolStore.persist(object);
 					ReferenceInfo.addReplacement(replacementsByClass, object
 							.getClass(), new Reference<RioolObject>(
-							ReferenceType.key, feature.getKey()),
+							ReferenceType.key, key.toString()),
 							new Reference<RioolObject>(object.getId()));
 
 					break;
 				case update:
-					object.setBeginLifeSpanVersion(date);
-					object = entityManager.merge(object);
+					object = rioolStore.merge(object);
 					feature.wrap(object);
 
 					break;
 				case delete:
-					// Does a soft delete by setting endLifeSpanVersion
-					entityManager.remove(object);
+					// Does a soft delete by setting endLifespanVersion
+					rioolStore.remove(object);
 					break;
 				default:
 				}
@@ -581,12 +519,12 @@ public class ServicesEndPoint {
 					RioolObject object = feature.unwrap();
 					ReferenceInfo
 							.replaceReferences(object, replacementsByClass);
-					object = entityManager.merge(object);
+					object = rioolStore.merge(object);
 					feature.wrap(object);
 				}
 			}
 
-			entityManager.flush();
+			rioolStore.flush();
 
 			validationReport = validate(features, PostPersist.class);
 
@@ -604,32 +542,11 @@ public class ServicesEndPoint {
 		List<ValidationResult> results = new ArrayList<ValidationResult>(
 				features.size());
 
-		Validator validator = validatorFactory.getValidator();
-
 		for (ModifiedFeature<RioolObject> feature : features) {
-			RioolObject object = feature.unwrap();
-			String layerBodId = feature.getLayerBodId();
-			Long key = feature.getKey();
-
-			if (feature.getAction() != ModificationAction.delete) {
-				Set<ConstraintViolation<RioolObject>> violations = validator
-						.validate(feature.unwrap(), groups);
-				if (violations.size() > 0) {
-					List<ValidationMessage> messages = new ArrayList<ValidationMessage>();
-					for (ConstraintViolation<RioolObject> violation : violations) {
-						messages.add(new ValidationMessage(
-								ValidationLevel.error, violation
-										.getPropertyPath().toString(),
-								violation.getMessage()));
-					}
-
-					valid = false;
-					results.add(new ValidationResult(layerBodId, key, false,
-							messages));
-				} else {
-					results.add(new ValidationResult(layerBodId, key, true));
-
-				}
+			ValidationResult result = validate(feature, groups);
+			if (result != null) {
+				valid &= result.isValid();
+				results.add(result);
 			}
 		}
 
@@ -637,6 +554,38 @@ public class ServicesEndPoint {
 			sessionContext.setRollbackOnly();
 
 		return new ValidationReport(valid, results);
+	}
+
+	protected ValidationResult validate(ModifiedFeature<RioolObject> feature,
+			Class<?>... groups) {
+
+		if (feature.getAction() != ModificationAction.delete) {
+			return validate(feature.unwrap(), feature.getLayerBodId(),
+					feature.getKey(), groups);
+		}
+
+		return null;
+	}
+
+	protected ValidationResult validate(RioolObject object, String layerBodId,
+			Long key, Class<?>... groups) {
+
+		Set<ConstraintViolation<RioolObject>> violations = rioolStore.validate(
+				object, groups);
+
+		if (violations.size() > 0) {
+			List<ValidationMessage> messages = new ArrayList<ValidationMessage>();
+			for (ConstraintViolation<RioolObject> violation : violations) {
+				messages.add(new ValidationMessage(ValidationLevel.error,
+						violation.getPropertyPath().toString(), violation
+								.getMessage()));
+			}
+
+			return new ValidationResult(layerBodId, key, false, messages);
+		} else {
+			return new ValidationResult(layerBodId, key, true);
+
+		}
 	}
 
 	/**
@@ -719,49 +668,30 @@ public class ServicesEndPoint {
 					.search(searchText, CRS.decode("EPSG:31370", true));
 		} else if ("featureidentify".equals(type)) {
 			Geometry location = bbox.getGeometry();
-			location.setSRID(31370);
 
 			List<SearchResult> results = new ArrayList<SearchResult>();
 
-			for (String layerBodId : features.split(",")) {
-				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			List<RioolObject> objects = rioolStore.query(FeatureInfo
+					.<RioolObject> getFeatureClasses(features.split(",")),
+					location, MAX_RESULTS_SEARCH);
 
-				Class<Object> clazz = FeatureInfo.getFeatureClass(layerBodId);
+			for (RioolObject object : objects) {
+				SearchResult result = new SearchResult();
+				result.setWeight(10);
 
-				CriteriaQuery<Object[]> criteria = builder
-						.createQuery(Object[].class);
-				Root<Object> root = criteria.from(clazz);
-				criteria.select(builder.array(root.get("id"), root.get("geom")));
+				result.setAttr("origin", "feature");
+				result.setAttr("layer",
+						FeatureInfo.getLayerBodId(object.getClass()));
 
-				criteria.where(builder.equal(
-						builder.function("intersects", Boolean.class,
-								root.get("geom"), builder.literal(location)),
-						Boolean.TRUE));
+				result.setAttr("featureId", object.getId());
 
-				TypedQuery<Object[]> query = entityManager
-						.createQuery(criteria);
+				result.setAttr("label", object.getId());
 
-				for (Object[] item : query.getResultList()) {
-					SearchResult result = new SearchResult();
-					result.setWeight(10);
-
-					result.setAttr("origin", "feature");
-					result.setAttr("layer", layerBodId);
-
-					result.setAttr("featureId", item[0]);
-
-					result.setAttr("label", item[0]);
-
-					Envelope envelope = ((Geometry) item[1])
-							.getEnvelopeInternal();
-					result.setAttr(
-							"geom_st_box2d",
-							"BOX(" + envelope.getMinX() + " "
-									+ envelope.getMinY() + ","
-									+ envelope.getMaxX() + " "
-									+ envelope.getMaxY() + ")");
-					results.add(result);
-				}
+				Envelope envelope = object.getGeom().getEnvelopeInternal();
+				result.setAttr("geom_st_box2d", "BOX(" + envelope.getMinX()
+						+ " " + envelope.getMinY() + "," + envelope.getMaxX()
+						+ " " + envelope.getMaxY() + ")");
+				results.add(result);
 			}
 
 			return new SearchResults(results);
@@ -773,33 +703,64 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/CodeServer/{type}")
 	@Produces("application/json")
-	public List<Object> getCodes(@PathParam("mapId") String mapId,
+	@SuppressWarnings("unchecked")
+	public List<Code> getCodes(@PathParam("mapId") String mapId,
 			@PathParam("type") String type) throws ClassNotFoundException {
-
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-		@SuppressWarnings("unchecked")
-		Class<Object> clazz = (Class<Object>) Class.forName(type);
-
-		CriteriaQuery<Object> criteria = builder.createQuery(clazz);
-		Root<Object> root = criteria.from(clazz);
-		criteria.select(root);
-
-		TypedQuery<Object> query = entityManager.createQuery(criteria);
-
-		return query.getResultList();
+		return rioolStore.getCodes((Class<Code>) Class.forName(type));
 	}
 
 	@GET
 	@Path("/{mapId}/CodeServer/{type}/{id}")
 	@Produces("application/json")
+	@SuppressWarnings("unchecked")
 	public Object getCode(@PathParam("mapId") String mapId,
 			@PathParam("type") String type, @PathParam("id") Long id)
 			throws ClassNotFoundException {
+		return rioolStore.getCode((Class<Code>) Class.forName(type), id);
+	}
 
-		@SuppressWarnings("unchecked")
-		Class<Object> clazz = (Class<Object>) Class.forName(type);
+	@POST
+	@Path("/{mapId}/DataServer")
+	@Consumes("application/xml")
+	@Produces("application/xml")
+	@SuppressWarnings("unchecked")
+	@Transactional
+	public Object _import(@PathParam("mapId") String mapId, InputStream in)
+			throws IOException, TransformerException, JAXBException,
+			IllegalStateException, SystemException, SecurityException,
+			NotSupportedException, RollbackException, HeuristicMixedException,
+			HeuristicRollbackException {
 
-		return entityManager.find(clazz, id);
+		Riool riool = new GML2Model().transform(in);
+		List<RioolObject> objects = riool.getObjects();
+		List<ModifiedFeature<RioolObject>> features = new ArrayList<ModifiedFeature<RioolObject>>(
+				objects.size());
+
+		long key = 0L;
+		for (RioolObject object : objects) {
+			Long namespaceId = object.getNamespaceId();
+			String alternatieveId = object.getAlternatieveId();
+
+			ModificationAction action = ModificationAction.create;
+			if (rioolStore.exists((Class<RioolObject>) object.getClass(),
+					namespaceId, alternatieveId)) {
+				action = ModificationAction.update;
+			}
+
+			features.add(new ModifiedFeature<RioolObject>(object, key++, action));
+		}
+
+		return push(mapId, features);
+	}
+
+	@GET
+	@Path("/{mapId}/DataServer/{layerBodId}/{id}")
+	@Produces("application/xml")
+	public Object export(@PathParam("mapId") String mapId,
+			@PathParam("layerBodId") String layerBodId, @PathParam("id") Long id)
+			throws ClassNotFoundException {
+
+		return rioolStore.getObject(
+				FeatureInfo.<RioolObject> getFeatureClass(layerBodId), id);
 	}
 }

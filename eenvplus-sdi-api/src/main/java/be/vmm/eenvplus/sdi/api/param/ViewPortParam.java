@@ -1,4 +1,4 @@
-package be.vmm.eenvplus.sdi.api.json;
+package be.vmm.eenvplus.sdi.api.param;
 
 public class ViewPortParam {
 

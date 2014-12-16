@@ -1,7 +1,11 @@
 package be.vmm.eenvplus.sdi.api;
 
-import be.vmm.eenvplus.sdi.api.json.Feature;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+import be.vmm.eenvplus.sdi.api.feature.Feature;
+
+@XmlRootElement
 public class FeatureResult<T> {
 
 	protected Feature<T> feature;
@@ -13,6 +17,7 @@ public class FeatureResult<T> {
 		this.feature = feature;
 	}
 
+	@XmlElement
 	public Feature<T> getFeature() {
 		return feature;
 	}

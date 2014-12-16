@@ -3,7 +3,7 @@ package be.vmm.eenvplus.sdi.api;
 import java.util.Collections;
 import java.util.List;
 
-import be.vmm.eenvplus.sdi.api.json.Feature;
+import be.vmm.eenvplus.sdi.api.feature.Feature;
 
 public class IdentifyResults<T> {
 

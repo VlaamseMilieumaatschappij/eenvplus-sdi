@@ -10,6 +10,12 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
@@ -21,6 +27,7 @@ import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
 import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
+import be.vmm.eenvplus.sdi.model.jaxb.GeometryXmlAdapter;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
 
@@ -30,9 +37,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 @Entity
 @Table(schema = "gengis")
-@Where(clause = "endLifeSpanVersion IS NULL")
-@SQLDelete(sql = "UPDATE gengis.KoppelPunt SET endLifeSpanVersion = now() WHERE id = ?")
+@Where(clause = "endLifespanVersion IS NULL")
+@SQLDelete(sql = "UPDATE gengis.KoppelPunt SET endLifespanVersion = now() WHERE id = ?")
 @Unique(value = { "namespaceId", "alternatieveId" }, groups = PostPersist.class)
+@XmlRootElement(name = "KoppelPunt")
+@XmlType(propOrder = { "id", "creationDate", "beginLifespanVersion",
+		"endLifespanVersion", "userId", "alternatieveId", "namespaceId", "geom" })
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class KoppelPunt implements RioolObject {
 
 	@Id
@@ -41,11 +52,13 @@ public class KoppelPunt implements RioolObject {
 	protected Long id;
 
 	protected Date creationDate;
-	protected Date beginLifeSpanVersion;
-	protected Date endLifeSpanVersion;
+	protected Date beginLifespanVersion;
+	protected Date endLifespanVersion;
+
+	@Column(name = "user_id")
+	protected String userId;
 
 	protected String alternatieveId;
-
 	@NotNull
 	@Refers(entityType = Namespace.class, groups = PrePersist.class)
 	protected Long namespaceId;
@@ -53,12 +66,10 @@ public class KoppelPunt implements RioolObject {
 	@NotNull
 	@GeometryType("Point")
 	@Type(type = "org.hibernate.spatial.GeometryType")
+	@XmlTransient
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)
 	protected Geometry geom;
-
-	@Column(name = "user_id")
-	protected String userId;
 
 	public Long getId() {
 		return id;
@@ -76,20 +87,28 @@ public class KoppelPunt implements RioolObject {
 		this.creationDate = creationDate;
 	}
 
-	public Date getBeginLifeSpanVersion() {
-		return beginLifeSpanVersion;
+	public Date getBeginLifespanVersion() {
+		return beginLifespanVersion;
 	}
 
-	public void setBeginLifeSpanVersion(Date beginLifeSpanVersion) {
-		this.beginLifeSpanVersion = beginLifeSpanVersion;
+	public void setBeginLifespanVersion(Date beginLifespanVersion) {
+		this.beginLifespanVersion = beginLifespanVersion;
 	}
 
-	public Date getEndLifeSpanVersion() {
-		return endLifeSpanVersion;
+	public Date getEndLifespanVersion() {
+		return endLifespanVersion;
 	}
 
-	public void setEndLifeSpanVersion(Date endLifeSpanVersion) {
-		this.endLifeSpanVersion = endLifeSpanVersion;
+	public void setEndLifespanVersion(Date endLifespanVersion) {
+		this.endLifespanVersion = endLifespanVersion;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getAlternatieveId() {
@@ -108,19 +127,12 @@ public class KoppelPunt implements RioolObject {
 		this.namespaceId = namespaceId;
 	}
 
+	@XmlJavaTypeAdapter(value = GeometryXmlAdapter.class)
 	public Geometry getGeom() {
 		return geom;
 	}
 
 	public void setGeom(Geometry geom) {
 		this.geom = geom;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 }

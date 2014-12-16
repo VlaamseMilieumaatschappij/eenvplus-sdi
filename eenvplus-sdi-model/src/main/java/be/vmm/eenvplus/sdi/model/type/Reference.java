@@ -1,10 +1,13 @@
 package be.vmm.eenvplus.sdi.model.type;
 
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.io.Serializable;
-
+@XmlJavaTypeAdapter(ReferenceXmlAdapter.class)
 @JsonSerialize(using = ReferenceSerializer.class)
 @JsonDeserialize(using = ReferenceDeserializer.class)
 public class Reference<T> implements Serializable {
@@ -22,6 +25,9 @@ public class Reference<T> implements Serializable {
 
 	public static <T> Reference<T> fromString(String string) {
 
+		if (string == null || string.isEmpty())
+			return null;
+
 		ReferenceType type = ReferenceType.id;
 		for (ReferenceType v : ReferenceType.values()) {
 			if (string.startsWith(v.token)) {
@@ -31,18 +37,23 @@ public class Reference<T> implements Serializable {
 			}
 		}
 
-		return new Reference<T>(type, Long.parseLong(string));
+		try {
+			return new Reference<T>(type,
+					type == ReferenceType.id ? Long.parseLong(string) : string);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	protected ReferenceType type;
-	protected long value;
+	protected Object value;
 
 	public Reference(long id) {
 		this.type = ReferenceType.id;
 		this.value = id;
 	}
 
-	public Reference(ReferenceType type, long value) {
+	public Reference(ReferenceType type, Object value) {
 		this.type = type;
 		this.value = value;
 	}
@@ -51,7 +62,7 @@ public class Reference<T> implements Serializable {
 		return type;
 	}
 
-	public long getValue() {
+	public Object getValue() {
 		return value;
 	}
 
@@ -64,12 +75,12 @@ public class Reference<T> implements Serializable {
 		@SuppressWarnings("unchecked")
 		Reference<T> r = (Reference<T>) o;
 
-		return type == r.type && value == r.value;
+		return type == r.type && value.equals(r.value);
 	}
 
 	@Override
 	public int hashCode() {
-		return type.hashCode() ^ new Long(value).hashCode();
+		return type.hashCode() ^ value.hashCode();
 	}
 
 	@Override

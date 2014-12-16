@@ -1,4 +1,4 @@
-package be.vmm.eenvplus.sdi.api.json;
+package be.vmm.eenvplus.sdi.api.feature;
 
 import java.beans.PropertyDescriptor;
 import java.util.Collection;
@@ -6,12 +6,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.FeaturePropertiesDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.FeaturePropertiesSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@XmlType
 @JsonSerialize(using = FeaturePropertiesSerializer.class)
 @JsonDeserialize(using = FeaturePropertiesDeserializer.class)
 public class FeatureProperties<T> implements Map<String, Object> {
@@ -282,5 +286,13 @@ public class FeatureProperties<T> implements Map<String, Object> {
 
 	protected Map<String, PropertyDescriptor> getPropertyDescriptors() {
 		return getBeanInfo().getPropertyDescriptors();
+	}
+
+	@XmlElement
+	public String getTest() {
+		return null;
+	}
+
+	public void setTest(String test) {
 	}
 }

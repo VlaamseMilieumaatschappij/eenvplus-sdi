@@ -21,6 +21,14 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Type;
@@ -39,6 +47,7 @@ import be.vmm.eenvplus.sdi.model.constraint.RefersNode;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
 import be.vmm.eenvplus.sdi.model.constraint.group.PostPersist;
 import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
+import be.vmm.eenvplus.sdi.model.jaxb.GeometryXmlAdapter;
 import be.vmm.eenvplus.sdi.model.type.Reference;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -49,9 +58,16 @@ import com.vividsolutions.jts.geom.Geometry;
 
 @Entity
 @Table(schema = "gengis")
-@Where(clause = "endLifeSpanVersion IS NULL")
-@SQLDelete(sql = "UPDATE gengis.RioolLink SET endLifeSpanVersion = now() WHERE id = ?")
+@Where(clause = "endLifespanVersion IS NULL")
+@SQLDelete(sql = "UPDATE gengis.RioolLink SET endLifespanVersion = now() WHERE id = ?")
 @Unique(value = { "namespaceId", "alternatieveId" }, groups = PostPersist.class)
+@XmlRootElement(name = "RioolLink")
+@XmlType(propOrder = { "id", "creationDate", "beginLifespanVersion",
+		"endLifespanVersion", "userId", "alternatieveId", "namespaceId",
+		"rioolLinkTypeId", "sewerWaterTypeId", "diameter", "pressure", "label",
+		"omschrijving", "straatId", "statussen", "startKoppelPuntId",
+		"endKoppelPuntId", "geom" })
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class RioolLink implements RioolObject {
 
 	@Id
@@ -60,18 +76,24 @@ public class RioolLink implements RioolObject {
 	protected Long id;
 
 	protected Date creationDate;
-	protected Date beginLifeSpanVersion;
-	protected Date endLifeSpanVersion;
+	protected Date beginLifespanVersion;
+	protected Date endLifespanVersion;
+
+	@Column(name = "user_id")
+	protected String userId;
 
 	protected String alternatieveId;
+	@NotNull
+	@Refers(entityType = Namespace.class, groups = PrePersist.class)
+	protected Long namespaceId;
 
 	@NotNull
 	@Refers(entityType = RioolLinkType.class, groups = PrePersist.class)
 	protected Long rioolLinkTypeId;
 	@NotNull
-	protected Reference<KoppelPunt> startKoppelPuntId;
-	@NotNull
-	protected Reference<KoppelPunt> endKoppelPuntId;
+	@Refers(entityType = SewerWaterType.class, groups = PrePersist.class)
+	protected Long sewerWaterTypeId;
+
 	@NotNull
 	@DecimalMin("250")
 	@DecimalMax("3200")
@@ -81,11 +103,9 @@ public class RioolLink implements RioolObject {
 	@DecimalMax("15.0")
 	@Digits(integer = 2, fraction = 2)
 	protected Double pressure;
+
 	protected String label;
 	protected String omschrijving;
-	@NotNull
-	@Refers(entityType = SewerWaterType.class, groups = PrePersist.class)
-	protected Long sewerWaterTypeId;
 
 	protected Long straatId;
 
@@ -96,18 +116,17 @@ public class RioolLink implements RioolObject {
 	protected List<RioolLinkStatus> statussen;
 
 	@NotNull
-	@Refers(entityType = Namespace.class, groups = PrePersist.class)
-	protected Long namespaceId;
+	protected Reference<KoppelPunt> startKoppelPuntId;
+	@NotNull
+	protected Reference<KoppelPunt> endKoppelPuntId;
 
 	@NotNull
 	@GeometryType("LineString")
 	@Type(type = "org.hibernate.spatial.GeometryType")
+	@XmlTransient
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)
 	protected Geometry geom;
-
-	@Column(name = "user_id")
-	protected String userId;
 
 	public Long getId() {
 		return id;
@@ -125,20 +144,28 @@ public class RioolLink implements RioolObject {
 		this.creationDate = creationDate;
 	}
 
-	public Date getBeginLifeSpanVersion() {
-		return beginLifeSpanVersion;
+	public Date getBeginLifespanVersion() {
+		return beginLifespanVersion;
 	}
 
-	public void setBeginLifeSpanVersion(Date beginLifeSpanVersion) {
-		this.beginLifeSpanVersion = beginLifeSpanVersion;
+	public void setBeginLifespanVersion(Date beginLifespanVersion) {
+		this.beginLifespanVersion = beginLifespanVersion;
 	}
 
-	public Date getEndLifeSpanVersion() {
-		return endLifeSpanVersion;
+	public Date getEndLifespanVersion() {
+		return endLifespanVersion;
 	}
 
-	public void setEndLifeSpanVersion(Date endLifeSpanVersion) {
-		this.endLifeSpanVersion = endLifeSpanVersion;
+	public void setEndLifespanVersion(Date endLifespanVersion) {
+		this.endLifespanVersion = endLifespanVersion;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getAlternatieveId() {
@@ -149,6 +176,14 @@ public class RioolLink implements RioolObject {
 		this.alternatieveId = alternatieveId;
 	}
 
+	public Long getNamespaceId() {
+		return namespaceId;
+	}
+
+	public void setNamespaceId(Long namespaceId) {
+		this.namespaceId = namespaceId;
+	}
+
 	public Long getRioolLinkTypeId() {
 		return rioolLinkTypeId;
 	}
@@ -157,20 +192,12 @@ public class RioolLink implements RioolObject {
 		this.rioolLinkTypeId = rioolLinkTypeId;
 	}
 
-	public Reference<KoppelPunt> getStartKoppelPuntId() {
-		return startKoppelPuntId;
+	public Long getSewerWaterTypeId() {
+		return sewerWaterTypeId;
 	}
 
-	public void setStartKoppelPuntId(Reference<KoppelPunt> startKoppelPuntId) {
-		this.startKoppelPuntId = startKoppelPuntId;
-	}
-
-	public Reference<KoppelPunt> getEndKoppelPuntId() {
-		return endKoppelPuntId;
-	}
-
-	public void setEndKoppelPuntId(Reference<KoppelPunt> endKoppelPuntId) {
-		this.endKoppelPuntId = endKoppelPuntId;
+	public void setSewerWaterTypeId(Long sewerWaterTypeId) {
+		this.sewerWaterTypeId = sewerWaterTypeId;
 	}
 
 	public Double getDiameter() {
@@ -205,14 +232,6 @@ public class RioolLink implements RioolObject {
 		this.omschrijving = omschrijving;
 	}
 
-	public Long getSewerWaterTypeId() {
-		return sewerWaterTypeId;
-	}
-
-	public void setSewerWaterTypeId(Long sewerWaterTypeId) {
-		this.sewerWaterTypeId = sewerWaterTypeId;
-	}
-
 	public Long getStraatId() {
 		return straatId;
 	}
@@ -221,6 +240,8 @@ public class RioolLink implements RioolObject {
 		this.straatId = straatId;
 	}
 
+	@XmlElementWrapper(name = "statussen")
+	@XmlElement(name = "status")
 	public List<RioolLinkStatus> getStatussen() {
 		return statussen;
 	}
@@ -229,14 +250,23 @@ public class RioolLink implements RioolObject {
 		this.statussen = statussen;
 	}
 
-	public Long getNamespaceId() {
-		return namespaceId;
+	public Reference<KoppelPunt> getStartKoppelPuntId() {
+		return startKoppelPuntId;
 	}
 
-	public void setNamespaceId(Long namespaceId) {
-		this.namespaceId = namespaceId;
+	public void setStartKoppelPuntId(Reference<KoppelPunt> startKoppelPuntId) {
+		this.startKoppelPuntId = startKoppelPuntId;
 	}
 
+	public Reference<KoppelPunt> getEndKoppelPuntId() {
+		return endKoppelPuntId;
+	}
+
+	public void setEndKoppelPuntId(Reference<KoppelPunt> endKoppelPuntId) {
+		this.endKoppelPuntId = endKoppelPuntId;
+	}
+
+	@XmlJavaTypeAdapter(value = GeometryXmlAdapter.class)
 	public Geometry getGeom() {
 		return geom;
 	}
@@ -245,22 +275,14 @@ public class RioolLink implements RioolObject {
 		this.geom = geom;
 	}
 
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
 	@RefersNode(nodePosition = NodePosition.start, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01, groups = PostPersist.class)
-	protected NodeValue getStartKoppelPuntReference() {
-		return new NodeValue(startKoppelPuntId.getValue(), geom);
+	protected NodeValue<KoppelPunt> getStartKoppelPuntReference() {
+		return new NodeValue<KoppelPunt>(startKoppelPuntId, geom);
 	}
 
 	@RefersNode(nodePosition = NodePosition.end, nodeType = KoppelPunt.class, nodeGeometryName = "geom", maxDistance = 0.01, groups = PostPersist.class)
-	protected NodeValue getEndKoppelPuntReference() {
-		return new NodeValue(endKoppelPuntId.getValue(), geom);
+	protected NodeValue<KoppelPunt> getEndKoppelPuntReference() {
+		return new NodeValue<KoppelPunt>(endKoppelPuntId, geom);
 	}
 
 	@AssertQuery(value = {

@@ -9,6 +9,10 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import be.vmm.eenvplus.sdi.model.code.Status;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
@@ -16,6 +20,9 @@ import be.vmm.eenvplus.sdi.model.constraint.group.PrePersist;
 
 @Entity
 @Table(name = "rioollink_status", schema = "gengis")
+@XmlRootElement
+@XmlType(propOrder = { "id", "statusId", "geldigVanaf", "geldigTot" })
+@XmlAccessorType(XmlAccessType.PROPERTY)
 public class RioolLinkStatus {
 
 	@Id

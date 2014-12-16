@@ -1,6 +1,6 @@
 package be.vmm.eenvplus.sdi.api;
 
-import be.vmm.eenvplus.sdi.api.json.Feature;
+import be.vmm.eenvplus.sdi.api.feature.Feature;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

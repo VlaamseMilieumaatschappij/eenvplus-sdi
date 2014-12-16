@@ -1,7 +1,11 @@
-package be.vmm.eenvplus.sdi.api.json;
+package be.vmm.eenvplus.sdi.api.feature;
 
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometryDeserializer;
 import be.vmm.eenvplus.sdi.plugins.providers.jackson.GeometrySerializer;
@@ -13,10 +17,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
+@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Feature<T> {
 
 	protected T object;
+
+	public Feature() {
+	}
 
 	public Feature(T object) {
 		this.object = object;
@@ -35,6 +43,7 @@ public class Feature<T> {
 		this.object = (T) FeatureInfo.getFeatureClass(layerBodId).newInstance();
 	}
 
+	@XmlElement
 	public Long getId() {
 		try {
 			return (Long) getBeanInfo().getIdDescriptor().getReadMethod()
@@ -52,24 +61,29 @@ public class Feature<T> {
 		}
 	}
 
-	public Object getFeatureId() {
+	@XmlElement
+	public Long getFeatureId() {
 		return getId();
 	}
 
+	@XmlElement
 	public String getType() {
 		return "Feature";
 	}
 
+	@XmlElement
 	public String getLayerBodId() {
 		return FeatureInfo.getLayerBodId(object.getClass());
 	}
 
+	@XmlElement
 	public FeatureProperties<T> getProperties() throws IntrospectionException,
 			IllegalAccessException, IllegalArgumentException,
 			InvocationTargetException {
 		return new FeatureProperties<T>(object);
 	}
 
+	@XmlTransient
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)
 	public Geometry getGeometry() throws IntrospectionException,

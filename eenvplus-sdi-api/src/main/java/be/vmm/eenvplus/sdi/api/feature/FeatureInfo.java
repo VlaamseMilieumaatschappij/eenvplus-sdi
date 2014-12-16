@@ -1,4 +1,4 @@
-package be.vmm.eenvplus.sdi.api.json;
+package be.vmm.eenvplus.sdi.api.feature;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -49,14 +49,26 @@ public class FeatureInfo {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Class<Object> getFeatureClass(String layerBodId)
+	public static <T> Class<T> getFeatureClass(String layerBodId)
 			throws ClassNotFoundException {
 
 		int index = layerBodId.indexOf(':');
 		if (index > 0)
 			layerBodId = layerBodId.substring(index + 1);
 
-		return (Class<Object>) Class.forName(layerBodId);
+		return (Class<T>) Class.forName(layerBodId);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> Class<T>[] getFeatureClasses(String[] layerBodIds)
+			throws ClassNotFoundException {
+		Class<T>[] result = new Class[layerBodIds.length];
+
+		for (int i = 0; i < layerBodIds.length; i++) {
+			result[i] = getFeatureClass(layerBodIds[i]);
+		}
+
+		return result;
 	}
 
 	public static String getLayerBodId(Class<?> clazz) {

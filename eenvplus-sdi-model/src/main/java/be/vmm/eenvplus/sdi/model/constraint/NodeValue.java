@@ -1,19 +1,21 @@
 package be.vmm.eenvplus.sdi.model.constraint;
 
+import be.vmm.eenvplus.sdi.model.type.Reference;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
-public class NodeValue {
+public class NodeValue<T> {
 
-	protected Long reference;
+	protected Reference<T> reference;
 	protected Geometry geometry;
 
-	public NodeValue(Long reference, Geometry geometry) {
+	public NodeValue(Reference<T> reference, Geometry geometry) {
 		this.reference = reference;
 		this.geometry = geometry;
 	}
 
-	public Long getReference() {
+	public Reference<T> getReference() {
 		return reference;
 	}
 

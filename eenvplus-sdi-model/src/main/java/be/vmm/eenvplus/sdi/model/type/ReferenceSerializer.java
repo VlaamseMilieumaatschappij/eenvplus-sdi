@@ -18,7 +18,7 @@ public class ReferenceSerializer extends JsonSerializer<Reference> {
 			JsonProcessingException {
 
 		if (reference.getType() == ReferenceType.id)
-			generator.writeNumber(reference.getValue());
+			generator.writeNumber((Long) reference.getValue());
 		else
 			generator.writeString(reference.toString());
 

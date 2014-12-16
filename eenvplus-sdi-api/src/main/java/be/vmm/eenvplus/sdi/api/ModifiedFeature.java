@@ -1,6 +1,6 @@
 package be.vmm.eenvplus.sdi.api;
 
-import be.vmm.eenvplus.sdi.api.json.Feature;
+import be.vmm.eenvplus.sdi.api.feature.Feature;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,6 +12,12 @@ public class ModifiedFeature<T> extends Feature<T> {
 
 	public ModifiedFeature(T object) {
 		super(object);
+	}
+
+	public ModifiedFeature(T object, Long key, ModificationAction action) {
+		super(object);
+		this.key = key;
+		this.action = action;
 	}
 
 	@JsonCreator

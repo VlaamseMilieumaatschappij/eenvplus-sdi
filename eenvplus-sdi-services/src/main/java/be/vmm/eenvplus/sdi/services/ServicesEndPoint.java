@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -186,31 +187,6 @@ public class ServicesEndPoint {
 	}
 
 	/**
-	 * This service can be used to retrieve a legend for a layer.
-	 * 
-	 * @param mapId
-	 *            The map ID.
-	 * @param layerBodId
-	 *            The layer ID (or technical name).
-	 * @param lang
-	 *            The language.
-	 */
-	@GET
-	@Path("/{mapId}/MapServer/{layerBodId}/legend")
-	@Produces("application/xhtml+xml")
-	public String getLegend(@PathParam("mapId") String mapId,
-			@PathParam("layerBodId") String layerBodId,
-			@QueryParam("lang") String lang) throws IOException {
-
-		Map<String, Object> params = new HashMap<String, Object>();
-
-		params.put("mapId", mapId);
-		params.put("layerBodId", layerBodId);
-
-		return templateHandler.evaluate("/templates/legend.fmt", null, params);
-	}
-
-	/**
 	 * With an ID and a layer ID (technical name), this service can be used to
 	 * retrieve a feature resource.
 	 * 
@@ -255,7 +231,8 @@ public class ServicesEndPoint {
 	@Produces("text/html")
 	public String getHTMLPopup(@PathParam("mapId") String mapId,
 			@PathParam("layerBodId") String layerBodId,
-			@PathParam("featureId") Long featureId) throws IOException,
+			@PathParam("featureId") Long featureId,
+			@QueryParam("lang") String lang) throws IOException,
 			ClassNotFoundException {
 
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -270,8 +247,8 @@ public class ServicesEndPoint {
 
 		params.put("feature", new Feature<RioolObject>(object));
 
-		return templateHandler.evaluate("/templates/htmlPopup.fmt", null,
-				params);
+		return templateHandler.evaluate("/templates/htmlPopup.fmt",
+				lang != null ? new Locale(lang) : null, params);
 	}
 
 	/**
@@ -291,7 +268,8 @@ public class ServicesEndPoint {
 	@Produces("text/html")
 	public String getExtendedHTMLPopup(@PathParam("mapId") String mapId,
 			@PathParam("layerBodId") String layerBodId,
-			@PathParam("featureId") Long featureId) throws IOException,
+			@PathParam("featureId") Long featureId,
+			@QueryParam("lang") String lang) throws IOException,
 			ClassNotFoundException {
 
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -307,7 +285,7 @@ public class ServicesEndPoint {
 		params.put("feature", new Feature<RioolObject>(object));
 
 		return templateHandler.evaluate("/templates/extendedHtmlPopup.fmt",
-				null, params);
+				lang != null ? new Locale(lang) : null, params);
 	}
 
 	/**
@@ -634,6 +612,46 @@ public class ServicesEndPoint {
 		return Response.ok(
 				getClass().getResourceAsStream("/settings/catalog.json"))
 				.build();
+	}
+
+	/**
+	 * This service can be used to retrieve a legend for a layer.
+	 * 
+	 * @param mapId
+	 *            The map ID.
+	 * @param layerBodId
+	 *            The layer ID (or technical name).
+	 * @param lang
+	 *            The language.
+	 */
+	@GET
+	@Path("/{mapId}/CatalogServer/{layerBodId}/legend")
+	@Produces("application/html")
+	public Response getLegend(@PathParam("mapId") String mapId,
+			@PathParam("layerBodId") String layerBodId,
+			@QueryParam("lang") String lang) throws IOException {
+
+		String name = layerBodId;
+		int index = name.lastIndexOf('.');
+		if (index > 0) {
+			name = name.substring(index + 1);
+		}
+
+		InputStream in = getClass().getResourceAsStream(
+				"/legends/" + name + ".html");
+		if (in != null) {
+			return Response.ok(in).build();
+		} else {
+			Map<String, Object> params = new HashMap<String, Object>();
+
+			params.put("mapId", mapId);
+			params.put("layerBodId", layerBodId);
+
+			return Response.ok(
+					templateHandler.evaluate("/templates/legend.fmt",
+							lang != null ? new Locale(lang) : null, params))
+					.build();
+		}
 	}
 
 	/**

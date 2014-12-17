@@ -32,6 +32,7 @@ import org.hibernate.annotations.Where;
 
 import be.vmm.eenvplus.sdi.model.code.Namespace;
 import be.vmm.eenvplus.sdi.model.code.RioolAppurtenanceType;
+import be.vmm.eenvplus.sdi.model.constraint.AssertQuery;
 import be.vmm.eenvplus.sdi.model.constraint.GeometrySimple;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
 import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
@@ -230,15 +231,24 @@ public class RioolAppurtenance implements RioolObject {
 		return new NodeValue<KoppelPunt>(koppelPuntId, geom);
 	}
 
-	// @AssertQuery("SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelPuntId",
-	// groups = PostPersist.class)
+	@AssertQuery(value = "SELECT count(l) = 0 FROM RioolLink l WHERE l.startKoppelPuntId = :koppelPuntId", groups = PostPersist.class)
 	protected Map<String, Object> getCheckUitlaatParams() {
 
 		if (Long.valueOf(6L/* dischargeStructure */).equals(
 				rioolAppurtenanceTypeId)) {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("koppelPuntId", koppelPuntId.getValue());
-			return params;
+			for (RioolAppurtenanceStatus status : statussen) {
+				Date now = new Date();
+				if (Long.valueOf(2L/* actief */).equals(
+						status.statusId.getValue())
+						&& (status.geldigVanaf == null || status.geldigVanaf
+								.before(now))
+						&& (status.geldigTot == null || status.geldigTot
+								.after(now))) {
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("koppelPuntId", koppelPuntId.getValue());
+					return params;
+				}
+			}
 		}
 
 		return null;

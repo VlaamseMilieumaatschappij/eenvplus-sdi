@@ -727,8 +727,7 @@ public class ServicesEndPoint {
 				result.setWeight(10);
 
 				result.setAttr("origin", "feature");
-				result.setAttr("layer",
-						FeatureInfo.getLayerBodId(object.getClass()));
+				result.setAttr("layer", object.getClass().getName());
 
 				result.setAttr("featureId", object.getId());
 

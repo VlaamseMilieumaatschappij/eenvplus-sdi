@@ -124,6 +124,7 @@
     "timeBehaviour": "last",
     "timeEnabled": false,
     "type": "wms",
-    "wmsUrl": "http://o-geoserver.vmm.be/geoserver/vmm/wms?layers=vmm:vha_segment&styles=line"
+	"style": "watercourses",
+	"wmsUrl": "http://o-geoserver.vmm.be/geoserver/vmm/wms?layers=vha_segment"
   }
 }

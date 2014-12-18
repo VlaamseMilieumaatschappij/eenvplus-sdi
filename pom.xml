@@ -197,5 +197,10 @@
             <name>Hibernate Spatial</name>
             <url>http://www.hibernatespatial.org/repository</url>
         </repository>
+        <repository>
+        	<id>jboss.org</id>
+            <name>jBoss</name>
+            <url>https://repository.jboss.org/nexus/content/repositories/public</url>
+        </repository>
 	</repositories>
 </project>

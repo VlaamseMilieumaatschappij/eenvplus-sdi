@@ -3,6 +3,7 @@ package be.vmm.eenvplus.sdi.services;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -38,6 +41,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
 import org.geotools.referencing.CRS;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
 
 import be.vmm.eenvplus.sdi.api.FeatureResult;
 import be.vmm.eenvplus.sdi.api.IdentifyResults;
@@ -80,6 +85,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 @Stateless
 @Path("/services")
+@PermitAll
 public class ServicesEndPoint {
 
 	public static int MAX_RESULTS_SEARCH = 10;
@@ -117,6 +123,7 @@ public class ServicesEndPoint {
 	@Path("/")
 	@Produces("application/json")
 	public Response getMapsConfig(@QueryParam("lang") String lang) {
+
 		return Response.ok(
 				getClass().getResourceAsStream("/settings/info.json")).build();
 	}
@@ -363,6 +370,7 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/MapServer/pull")
 	@Produces("application/json")
+	@RolesAllowed({ "editor" })
 	public List<Feature<RioolObject>> pull(@PathParam("mapId") String mapId,
 			@QueryParam("types") String types,
 			@QueryParam("extent") ExtentParam extent)
@@ -385,6 +393,7 @@ public class ServicesEndPoint {
 	@Consumes("application/json")
 	@Produces("application/json")
 	@Transactional
+	@RolesAllowed({ "editor" })
 	public ModificationReport push(@PathParam("mapId") String mapId,
 			List<ModifiedFeature<RioolObject>> features)
 			throws IllegalStateException, SystemException,
@@ -406,6 +415,8 @@ public class ServicesEndPoint {
 			String layerBodId = feature.getLayerBodId();
 			Object key = feature.getKey();
 			ModificationAction action = feature.getAction();
+
+			object.setUserId(getUserId());
 
 			switch (action) {
 			case create:
@@ -490,10 +501,13 @@ public class ServicesEndPoint {
 	@Consumes("application/json")
 	@Produces("application/json")
 	@Transactional
+	@RolesAllowed({ "editor" })
 	public ValidationReport test(@PathParam("mapId") String mapId,
 			List<ModifiedFeature<RioolObject>> features)
 			throws IllegalStateException, SystemException,
 			NotSupportedException {
+
+		System.out.println(sessionContext.getCallerIdentity().getName());
 
 		ValidationReport validationReport = validate(features, Default.class,
 				PrePersist.class);
@@ -507,6 +521,8 @@ public class ServicesEndPoint {
 				RioolObject object = feature.unwrap();
 				Object key = feature.getKey();
 				ModificationAction action = feature.getAction();
+
+				object.setUserId(getUserId());
 
 				switch (action) {
 				case create:
@@ -771,6 +787,7 @@ public class ServicesEndPoint {
 	@Produces({ "application/xml", "application/json" })
 	@SuppressWarnings("unchecked")
 	@Transactional
+	@RolesAllowed({ "editor" })
 	public ValidationReport _import(@PathParam("mapId") String mapId,
 			InputStream in) throws IOException, TransformerException,
 			JAXBException, IllegalStateException, SystemException,
@@ -817,5 +834,17 @@ public class ServicesEndPoint {
 
 		return rioolStore.getObject(
 				FeatureInfo.<RioolObject> getFeatureClass(layerBodId), id);
+	}
+
+	protected String getUserId() {
+
+		Principal principal = sessionContext.getCallerPrincipal();
+		if (principal instanceof KeycloakPrincipal) {
+			KeycloakSecurityContext securityContext = ((KeycloakPrincipal) principal)
+					.getKeycloakSecurityContext();
+			return securityContext.getToken().getPreferredUsername();
+		} else {
+			return principal.getName();
+		}
 	}
 }

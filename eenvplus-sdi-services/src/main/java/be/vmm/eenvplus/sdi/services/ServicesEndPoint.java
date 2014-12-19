@@ -507,8 +507,6 @@ public class ServicesEndPoint {
 			throws IllegalStateException, SystemException,
 			NotSupportedException {
 
-		System.out.println(sessionContext.getCallerIdentity().getName());
-
 		ValidationReport validationReport = validate(features, Default.class,
 				PrePersist.class);
 		if (!validationReport.isValid())

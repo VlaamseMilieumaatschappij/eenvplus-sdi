@@ -41,6 +41,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
 import org.geotools.referencing.CRS;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 
@@ -536,6 +537,7 @@ public class ServicesEndPoint {
 
 					break;
 				case delete:
+					object = rioolStore.merge(object);
 					// Does a soft delete by setting endLifespanVersion
 					rioolStore.remove(object);
 					break;
@@ -781,16 +783,19 @@ public class ServicesEndPoint {
 
 	@POST
 	@Path("/{mapId}/DataServer")
-	@Consumes("application/xml")
+	@Consumes("multipart/form-data")
 	@Produces({ "application/xml", "application/json" })
 	@SuppressWarnings("unchecked")
 	@Transactional
 	@RolesAllowed({ "editor" })
-	public ValidationReport _import(@PathParam("mapId") String mapId,
-			InputStream in) throws IOException, TransformerException,
+	public ValidationReport _import(@PathParam("mapId") String mapId, Map<String, InputStream> files)
+			throws IOException, TransformerException,
 			JAXBException, IllegalStateException, SystemException,
 			SecurityException, NotSupportedException, RollbackException,
 			HeuristicMixedException, HeuristicRollbackException {
+
+		// (first) file content as inputstream
+		InputStream in = files.values().iterator().next();
 
 		Riool riool = new GML2Model().transform(in);
 		List<RioolObject> objects = riool.getObjects();

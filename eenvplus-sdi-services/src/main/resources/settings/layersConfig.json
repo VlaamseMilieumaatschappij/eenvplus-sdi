@@ -45,7 +45,7 @@
     "queryable": false,
     "searchable": false,
     "selectbyrectangle": false,
-    "serverLayerName": "ortho2002",
+    "serverLayerName": "orthoklmx",
     "timeBehaviour": "last",
     "timeEnabled": false,
     "type": "wmts"

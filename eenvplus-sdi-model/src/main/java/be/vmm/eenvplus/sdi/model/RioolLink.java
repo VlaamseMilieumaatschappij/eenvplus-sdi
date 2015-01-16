@@ -1,5 +1,6 @@
 package be.vmm.eenvplus.sdi.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -131,6 +132,10 @@ public class RioolLink implements RioolObject {
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)
 	protected Geometry geom;
+
+	public RioolLink() {
+		this.statussen = new ArrayList<RioolLinkStatus>(2);
+	}
 
 	public Long getId() {
 		return id;

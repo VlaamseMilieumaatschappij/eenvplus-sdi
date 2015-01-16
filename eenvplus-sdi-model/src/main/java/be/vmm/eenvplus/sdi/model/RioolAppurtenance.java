@@ -94,8 +94,8 @@ public class RioolAppurtenance implements RioolObject {
 
 	@Valid
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-			CascadeType.REFRESH, CascadeType.DETACH }, fetch = FetchType.EAGER)
-	@JoinColumn(name = "rioolappurtenanceid")
+			CascadeType.REFRESH, CascadeType.DETACH }, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "rioolappurtenanceid", nullable = false)
 	protected List<RioolAppurtenanceStatus> statussen;
 
 	@NotNull

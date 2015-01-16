@@ -111,8 +111,8 @@ public class RioolLink implements RioolObject {
 
 	@Valid
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-			CascadeType.REFRESH, CascadeType.DETACH }, fetch = FetchType.EAGER)
-	@JoinColumn(name = "rioollinkid")
+			CascadeType.REFRESH, CascadeType.DETACH }, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "rioollinkid", nullable = false)
 	protected List<RioolLinkStatus> statussen;
 
 	@NotNull

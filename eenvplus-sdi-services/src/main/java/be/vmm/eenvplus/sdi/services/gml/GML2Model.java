@@ -3,6 +3,8 @@ package be.vmm.eenvplus.sdi.services.gml;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.util.JAXBResult;
@@ -19,20 +21,22 @@ import org.xml.sax.SAXException;
 
 import be.vmm.eenvplus.sdi.model.Riool;
 
+@ApplicationScoped
 public class GML2Model {
 
-	protected final Validator validator;
-	protected final Transformer transformer;
+	//protected Validator validator;
+	protected Transformer transformer;
 
-	public GML2Model() {
+	@PostConstruct
+	public void init() {
 
 		try {
-			SchemaFactory schemaFactory = SchemaFactory
-					.newInstance("http://www.w3.org/2001/XMLSchema");
-			Schema schema = schemaFactory.newSchema(new StreamSource(getClass()
-					.getResourceAsStream("/xslts/eenv.xsd")));
-
-			validator = schema.newValidator();
+			//SchemaFactory schemaFactory = SchemaFactory
+			//		.newInstance("http://www.w3.org/2001/XMLSchema");
+			//Schema schema = schemaFactory.newSchema(new StreamSource(getClass()
+			//		.getResourceAsStream("/xslts/eenv.xsd")));
+			//
+			//validator = schema.newValidator();
 
 			TransformerFactory transformerFactory = TransformerFactory
 					.newInstance();
@@ -47,7 +51,7 @@ public class GML2Model {
 
 	public void validate(InputStream in) throws SAXException, IOException {
 
-		validator.validate(new StreamSource(in));
+		//validator.validate(new StreamSource(in));
 	}
 
 	public Riool transform(InputStream in) throws IOException,

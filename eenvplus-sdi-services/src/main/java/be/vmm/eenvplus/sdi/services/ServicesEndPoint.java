@@ -112,6 +112,9 @@ public class ServicesEndPoint {
 	@Inject
 	protected CrabGeoLocator geoLocator;
 
+	@Inject
+	protected GML2Model gml2Model;
+
 	/**
 	 * This service provides configuration data for all the available map
 	 * topics.
@@ -797,7 +800,7 @@ public class ServicesEndPoint {
 		// (first) file content as inputstream
 		InputStream in = files.values().iterator().next();
 
-		Riool riool = new GML2Model().transform(in);
+		Riool riool = gml2Model.transform(in);
 		List<RioolObject> objects = riool.getObjects();
 
 		ReferenceReplacer replacer = getCodeReferenceReplacer();

@@ -41,7 +41,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
 import org.geotools.referencing.CRS;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 
@@ -371,7 +370,7 @@ public class ServicesEndPoint {
 	@GET
 	@Path("/{mapId}/MapServer/pull")
 	@Produces("application/json")
-	@RolesAllowed({ "editor" })
+	@RolesAllowed({ "editor", "supervisor" })
 	public List<Feature<RioolObject>> pull(@PathParam("mapId") String mapId,
 			@QueryParam("types") String types,
 			@QueryParam("extent") ExtentParam extent)
@@ -394,7 +393,7 @@ public class ServicesEndPoint {
 	@Consumes("application/json")
 	@Produces("application/json")
 	@Transactional
-	@RolesAllowed({ "editor" })
+	@RolesAllowed({ "editor", "supervisor" })
 	public ModificationReport push(@PathParam("mapId") String mapId,
 			List<ModifiedFeature<RioolObject>> features)
 			throws IllegalStateException, SystemException,
@@ -502,7 +501,7 @@ public class ServicesEndPoint {
 	@Consumes("application/json")
 	@Produces("application/json")
 	@Transactional
-	@RolesAllowed({ "editor" })
+	@RolesAllowed({ "editor", "supervisor" })
 	public ValidationReport test(@PathParam("mapId") String mapId,
 			List<ModifiedFeature<RioolObject>> features)
 			throws IllegalStateException, SystemException,
@@ -787,12 +786,13 @@ public class ServicesEndPoint {
 	@Produces({ "application/xml", "application/json" })
 	@SuppressWarnings("unchecked")
 	@Transactional
-	@RolesAllowed({ "editor" })
-	public ValidationReport _import(@PathParam("mapId") String mapId, Map<String, InputStream> files)
-			throws IOException, TransformerException,
-			JAXBException, IllegalStateException, SystemException,
-			SecurityException, NotSupportedException, RollbackException,
-			HeuristicMixedException, HeuristicRollbackException {
+	@RolesAllowed({ "editor", "supervisor" })
+	public ValidationReport _import(@PathParam("mapId") String mapId,
+			Map<String, InputStream> files) throws IOException,
+			TransformerException, JAXBException, IllegalStateException,
+			SystemException, SecurityException, NotSupportedException,
+			RollbackException, HeuristicMixedException,
+			HeuristicRollbackException {
 
 		// (first) file content as inputstream
 		InputStream in = files.values().iterator().next();

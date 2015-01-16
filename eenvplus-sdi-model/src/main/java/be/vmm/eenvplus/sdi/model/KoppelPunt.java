@@ -22,6 +22,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.Where;
 
 import be.vmm.eenvplus.sdi.model.code.Namespace;
+import be.vmm.eenvplus.sdi.model.constraint.GeometrySingle;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
 import be.vmm.eenvplus.sdi.model.constraint.Unique;
@@ -66,6 +67,7 @@ public class KoppelPunt implements RioolObject {
 
 	@NotNull
 	@GeometryType("Point")
+	@GeometrySingle
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@XmlTransient
 	@JsonSerialize(using = GeometrySerializer.class)

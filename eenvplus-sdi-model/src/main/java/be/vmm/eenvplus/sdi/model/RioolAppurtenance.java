@@ -33,7 +33,7 @@ import org.hibernate.annotations.Where;
 import be.vmm.eenvplus.sdi.model.code.Namespace;
 import be.vmm.eenvplus.sdi.model.code.RioolAppurtenanceType;
 import be.vmm.eenvplus.sdi.model.constraint.AssertQuery;
-import be.vmm.eenvplus.sdi.model.constraint.GeometrySimple;
+import be.vmm.eenvplus.sdi.model.constraint.GeometrySingle;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
 import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
 import be.vmm.eenvplus.sdi.model.constraint.Refers;
@@ -104,7 +104,7 @@ public class RioolAppurtenance implements RioolObject {
 
 	@NotNull
 	@GeometryType("Point")
-	@GeometrySimple
+	@GeometrySingle
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@JsonSerialize(using = GeometrySerializer.class)
 	@JsonDeserialize(using = GeometryDeserializer.class)

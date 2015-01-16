@@ -39,6 +39,8 @@ import be.vmm.eenvplus.sdi.model.code.RioolLinkType;
 import be.vmm.eenvplus.sdi.model.code.SewerWaterType;
 import be.vmm.eenvplus.sdi.model.constraint.AssertQuery;
 import be.vmm.eenvplus.sdi.model.constraint.AssertQuery.AssertQueryCondition;
+import be.vmm.eenvplus.sdi.model.constraint.GeometrySimple;
+import be.vmm.eenvplus.sdi.model.constraint.GeometrySingle;
 import be.vmm.eenvplus.sdi.model.constraint.GeometryType;
 import be.vmm.eenvplus.sdi.model.constraint.NodePosition;
 import be.vmm.eenvplus.sdi.model.constraint.NodeValue;
@@ -122,6 +124,8 @@ public class RioolLink implements RioolObject {
 
 	@NotNull
 	@GeometryType("LineString")
+	@GeometrySingle
+	@GeometrySimple
 	@Type(type = "org.hibernate.spatial.GeometryType")
 	@XmlTransient
 	@JsonSerialize(using = GeometrySerializer.class)

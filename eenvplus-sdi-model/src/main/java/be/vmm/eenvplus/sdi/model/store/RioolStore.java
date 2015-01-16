@@ -145,6 +145,9 @@ public class RioolStore {
 
 		entityManager.joinTransaction();
 
+		// First get the object from the database
+		object = entityManager.getReference(object.getClass(), object.getId());
+
 		// Does a soft delete by setting endLifespanVersion
 		entityManager.remove(object);
 	}

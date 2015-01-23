@@ -12,7 +12,7 @@ public class Status implements Code {
 	@Id
 	protected Long id;
 
-	@Column(name = "status")
+	@Column(name = "status_en")
 	protected String label;
 
 	public Long getId() {

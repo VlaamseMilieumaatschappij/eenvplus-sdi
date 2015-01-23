@@ -12,7 +12,7 @@ public class RioolAppurtenanceType implements Code {
 	@Id
 	protected Long id;
 
-	@Column(name = "rioolAppurtenanceType")
+	@Column(name = "rioolAppurtenanceType_en")
 	protected String label;
 
 	public Long getId() {

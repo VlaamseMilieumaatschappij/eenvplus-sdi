@@ -12,7 +12,7 @@ public class RioolLinkType implements Code {
 	@Id
 	protected Long id;
 
-	@Column(name = "rioolLinkType")
+	@Column(name = "rioolLinkType_en")
 	protected String label;
 
 	public Long getId() {

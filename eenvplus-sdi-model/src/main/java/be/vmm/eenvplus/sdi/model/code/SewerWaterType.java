@@ -12,7 +12,7 @@ public class SewerWaterType implements Code {
 	@Id
 	protected Long id;
 
-	@Column(name = "sewerWaterType")
+	@Column(name = "sewerWaterType_en")
 	protected String label;
 
 	public Long getId() {

@@ -257,8 +257,28 @@ public class ServicesEndPoint {
 
 		params.put("feature", new Feature<RioolObject>(object));
 
-		return templateHandler.evaluate("/templates/htmlPopup.fmt",
-				lang != null ? new Locale(lang) : null, params);
+		String name = layerBodId;
+		int index = name.lastIndexOf('.');
+		if (index > 0) {
+			name = name.substring(index + 1);
+		}
+
+		if (! name.equals(layerBodId)) {
+			// custom template, additional data
+			params.put("object", object);
+
+			// can efficiënter; staat hibernate cache aan?
+			for (Class<Code> type : CODE_TYPES) {
+				params.put(type.getSimpleName(), rioolStore.getCodes(type));
+			}
+
+			return templateHandler.evaluate("/templates/htmlPopup_"+name+".fmt",
+					lang != null ? new Locale(lang) : null, params);
+		} else {
+			// generic temlate
+			return templateHandler.evaluate("/templates/htmlPopup.fmt",
+					lang != null ? new Locale(lang) : null, params);
+		}
 	}
 
 	/**

@@ -1,0 +1,19 @@
+<div class="htmlpopup-container">
+	<div class="htmlpopup-header">
+		Sewer appurtenance
+	</div>
+	<div class="htmlpopup-content">
+		<table>
+			<tr><td class="cell-left">INSPIRE-ID</td><td>${Namespace[object.namespaceId.value].label}:${object.id?c}</td></tr>
+			<tr><td class="cell-left">alternate id</td><td>${object.alternatieveId!"-"}</td></tr>
+			<tr><td class="cell-left">creation date</td><td>${object.creationDate!}</td></tr>
+			<tr><td class="cell-left">appurtenance type</td><td>${RioolAppurtenanceType[object.rioolAppurtenanceTypeId.value].label!}</td></tr>
+			<tr><td class="cell-left">state</td><td>
+				<#list object.statussen?sort_by("geldigVanaf") as status>
+				${Status[status.statusId.value].label} from ${(status.geldigVanaf?date)!"-"} to ${(status.geldigTot?date)!"-"}<br/>
+				</#list>
+			</td></tr>
+			<tr><td class="cell-left">node</td><td>${object.koppelPuntId!}</td></tr>
+		</table>
+	</div>
+</div>

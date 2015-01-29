@@ -10,7 +10,7 @@
 	<properties>
 		<platform>jboss</platform>
 		<java.version>1.7</java.version>
-		<resteasy.version>3.0.8.Final</resteasy.version>
+		<resteasy.version>3.0.10.Final</resteasy.version>
 		<geotools.version>12.0</geotools.version>
 	</properties>
 

@@ -6,17 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -57,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Table(schema = "gengis")
 @Where(clause = "endLifespanVersion IS NULL")
 @SQLDelete(sql = "UPDATE gengis.RioolAppurtenance SET endLifespanVersion = now() WHERE id = ?")
-@Unique(value = { "namespaceId", "alternatieveId" }, groups = PostPersist.class)
+@Unique(value = { "namespaceId", "alternatieveId" }, groups = PostPersist.class, message = "{be.vmm.constraints.unique.ns_alternateid}")
 @Static(value = "rioolAppurtenanceTypeId", groups = PrePersist.class)
 @XmlRootElement(name = "RioolAppurtenance")
 @XmlType(propOrder = { "id", "creationDate", "beginLifespanVersion",
@@ -97,6 +87,7 @@ public class RioolAppurtenance implements RioolObject {
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE,
 			CascadeType.REFRESH, CascadeType.DETACH }, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "rioolappurtenanceid", nullable = false)
+	@OrderBy("geldigTot")
 	protected List<RioolAppurtenanceStatus> statussen;
 
 	@NotNull

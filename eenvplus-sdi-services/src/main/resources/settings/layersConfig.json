@@ -67,7 +67,7 @@
     "timeBehaviour": "last",
     "timeEnabled": false,
     "type": "wms",
-    "wmsUrl": "http://o-geoserver.vmm.be/geoserver/eENVplus/wms?layers=eENVplus:v_appurtenance"
+    "wmsUrl": "http://${geoserver.url}/eENVplus/wms?layers=eENVplus:v_appurtenance"
   },
   "be.vmm.eenvplus.sdi.model.RioolLink": {
     "attribution": "vmm",
@@ -86,7 +86,7 @@
     "timeBehaviour": "last",
     "timeEnabled": false,
     "type": "wms",
-    "wmsUrl": "http://o-geoserver.vmm.be/geoserver/eENVplus/wms?layers=eENVplus:v_rioollink"
+    "wmsUrl": "http://${geoserver.url}/eENVplus/wms?layers=eENVplus:v_rioollink"
   },
   "be.vmm.eenvplus.sdi.model.KoppelPunt": {
     "attribution": "vmm",
@@ -105,7 +105,7 @@
     "timeBehaviour": "last",
     "timeEnabled": false,
     "type": "wms",
-    "wmsUrl": "http://o-geoserver.vmm.be/geoserver/eENVplus/wms?layers=eENVplus:koppelpunt"
+    "wmsUrl": "http://${geoserver.url}/eENVplus/wms?layers=eENVplus:koppelpunt"
   },
   "be.vmm.waterlopen": {
     "attribution": "vmm",
@@ -125,6 +125,6 @@
     "timeEnabled": false,
     "type": "wms",
 	"style": "watercourses",
-	"wmsUrl": "http://o-geoserver.vmm.be/geoserver/vmm/wms?layers=vha_segment"
+	"wmsUrl": "http://${geoserver.url}/vmm/wms?layers=vha_segment"
   }
 }
